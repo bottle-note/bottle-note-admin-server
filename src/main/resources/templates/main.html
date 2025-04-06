@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>보틀노트 어드민</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <!-- 사이드바 -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>위스키 관리</h3>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a th:href="@{/}">대시보드</a></li>
+
+            <li class="menu-with-submenu">
+                <span>위스키</span>
+                <ul class="submenu">
+                    <li><a th:href="@{/whisky/list}">위스키 목록</a></li>
+                    <li><a th:href="@{/whisky/manage}">위스키 관리</a></li>
+                </ul>
+            </li>
+
+            <li class="menu-with-submenu">
+                <span>문의</span>
+                <ul class="submenu">
+                    <li><a th:href="@{/inquiry/whisky}">위스키 문의</a></li>
+                    <li><a th:href="@{/inquiry/user}">사용자 문의</a></li>
+                    <li><a th:href="@{/inquiry/review}">리뷰 문의</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <!-- 헤더 -->
+        <div class="header">
+            <h1>보틀노트 어드민</h1>
+        </div>
+
+        <!-- 컨텐츠 영역 -->
+        <div class="content">
+            <h1 class="dashboard-title">대시보드</h1>
+
+            <div class="stat-blocks">
+                <!-- 위스키 수 -->
+                <div class="stat-block">
+                    <div class="stat-icon">🥃</div>
+                    <div>
+                        <div class="stat-value" th:text="${whiskeyCount}">0</div>
+                        <div class="stat-label">등록된 위스키</div>
+                    </div>
+                </div>
+
+                <!-- 사용자 수 -->
+                <div class="stat-block">
+                    <div class="stat-icon">👤</div>
+                    <div>
+                        <div class="stat-value" th:text="${userCount}">0</div>
+                        <div class="stat-label">사용자</div>
+                    </div>
+                </div>
+
+                <!-- 리뷰 수 -->
+                <div class="stat-block">
+                    <div class="stat-icon">✍️</div>
+                    <div>
+                        <div class="stat-value" th:text="${reviewCount}">0</div>
+                        <div class="stat-label">리뷰</div>
+                    </div>
+                </div>
+
+                <!-- 나머지 3개 통계 블록 -->
+                <div class="stat-block">
+                    <div class="stat-icon">🏆</div>
+                    <div>
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">인기 위스키</div>
+                    </div>
+                </div>
+
+                <div class="stat-block">
+                    <div class="stat-icon">📊</div>
+                    <div>
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">월간 통계</div>
+                    </div>
+                </div>
+
+                <div class="stat-block">
+                    <div class="stat-icon">📈</div>
+                    <div>
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">일간 접속</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 푸터 -->
+        <div class="footer">
+            <p>&copy; 2025 보틀노트 어드민</p>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/script.js}"></script>
+</body>
+</html>

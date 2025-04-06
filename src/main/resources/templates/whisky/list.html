@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" lang="ko">
+<head>
+    <title>위스키 목록 - 보틀노트 어드민</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="content-header">
+        <h1>위스키 목록</h1>
+        <div class="content-actions">
+            <a th:href="@{/whisky/create}" class="btn btn-primary">새 위스키 등록</a>
+        </div>
+    </div>
+
+    <!-- 검색 필터 -->
+    <div class="filter-section">
+        <form th:action="@{/whisky/list}" method="get" class="search-form">
+            <div class="form-group">
+                <label>
+                    <select name="searchType" class="form-control">
+                        <option value="name" th:selected="${param.searchType == 'name'}">이름</option>
+                        <option value="brand" th:selected="${param.searchType == 'brand'}">브랜드</option>
+                        <option value="country" th:selected="${param.searchType == 'country'}">국가</option>
+                    </select>
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="text" name="keyword" class="form-control" placeholder="검색어"
+                           th:value="${param.keyword}">
+                </label>
+            </div>
+            <button type="submit" class="btn btn-search">검색</button>
+        </form>
+    </div>
+
+    <!-- 위스키 목록 테이블 -->
+    <div class="table-container">
+        <table class="table whisky-table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>
+                    <a th:href="@{/whisky/list(page=${whiskyPage.number}, size=${whiskyPage.size}, sort='name')}"
+                       class="sort-link">이름</a>
+                </th>
+                <th>
+                    <a th:href="@{/whisky/list(page=${whiskyPage.number}, size=${whiskyPage.size}, sort='brand')}"
+                       class="sort-link">브랜드</a>
+                </th>
+                <th>
+                    <a th:href="@{/whisky/list(page=${whiskyPage.number}, size=${whiskyPage.size}, sort='country')}"
+                       class="sort-link">국가</a>
+                </th>
+                <th>
+                    <a th:href="@{/whisky/list(page=${whiskyPage.number}, size=${whiskyPage.size}, sort='abv')}"
+                       class="sort-link">도수</a>
+                </th>
+                <th>
+                    <a th:href="@{/whisky/list(page=${whiskyPage.number}, size=${whiskyPage.size}, sort='price')}"
+                       class="sort-link">가격</a>
+                </th>
+                <th>
+                    <a th:href="@{/whisky/list(page=${whiskyPage.number}, size=${whiskyPage.size}, sort='createdAt,desc')}"
+                       class="sort-link">등록일</a>
+                </th>
+                <th>관리</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="whisky : ${whiskyPage.content}">
+                <td th:text="${whisky.id}">1</td>
+                <td th:text="${whisky.name}">글렌피딕 12년</td>
+                <td th:text="${whisky.brand}">글렌피딕</td>
+                <td th:text="${whisky.country}">스코틀랜드</td>
+                <td th:text="${whisky.abv + '%'}">40%</td>
+                <td th:text="${#numbers.formatInteger(whisky.price, 3, 'COMMA') + '원'}">65,000원</td>
+                <td th:text="${#temporals.format(whisky.createdAt, 'yyyy-MM-dd')}">2025-01-15</td>
+                <td>
+                    <div class="action-buttons">
+                        <a th:href="@{/whisky/{id}/edit(id=${whisky.id})}" class="btn btn-sm btn-edit">수정</a>
+                        <a th:href="@{/whisky/{id}/detail(id=${whisky.id})}" class="btn btn-sm btn-view">조회</a>
+                    </div>
+                </td>
+            </tr>
+            <tr th:if="${whiskyPage.empty}">
+                <td colspan="8" class="text-center">등록된 위스키가 없습니다.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 페이징 -->
+    <div class="pagination-container" th:if="${whiskyPage.totalPages > 0}">
+        <!-- 페이징 코드 -->
+    </div>
+</div>
+</body>
+</html>
