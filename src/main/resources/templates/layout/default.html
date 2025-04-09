@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle} + ' - 보틀노트 어드민'">보틀노트 어드민</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.3/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/6.2.0/css/all.min.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <th:block layout:fragment="css"></th:block>
+</head>
+<body>
+<div class="wrapper">
+    <!-- 사이드바 -->
+    <nav id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h3>보틀노트 어드민</h3>
+        </div>
+        <ul class="list-unstyled components">
+            <li th:classappend="${currentUrl.contains('/dashboard')} ? 'active' : ''">
+                <a th:href="@{/dashboard}">
+                    <i class="fas fa-tachometer-alt"></i> 대시보드
+                </a>
+            </li>
+
+            <li th:classappend="${currentUrl.contains('/whisky')} ? 'active' : ''">
+                <a th:href="@{/whisky}">
+                    <i class="fas fa-glass-whiskey"></i> 위스키 관리
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/not-implemented}">
+                    <i class="fas fa-flag"></i> 신고 관리
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/not-implemented}">
+                    <i class="fas fa-question-circle"></i> 문의 관리
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- 메인 콘텐츠 -->
+    <div id="content">
+        <!-- 상단 네비게이션 -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <button type="button" id="sidebarCollapse" class="btn btn-info">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="nav navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <span class="nav-link" th:text="${pageTitle}">페이지 제목</span>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user"></i> 관리자
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="#">프로필</a></li>
+                                <li><a class="dropdown-item" href="#">설정</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" href="#">로그아웃</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <!-- 페이지 콘텐츠 -->
+        <div class="container-fluid">
+            <th:block layout:fragment="content"></th:block>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/webjars/jquery/3.6.1/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.2.3/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/webjars/chartjs/4.1.1/chart.umd.min.js}"></script>
+<script th:src="@{/js/admin.js}"></script>
+
+<th:block layout:fragment="script"></th:block>
+</body>
+</html>

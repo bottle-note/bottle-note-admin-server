@@ -1,39 +1,311 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout}" lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default.html}">
 <head>
-    <title>위스키 목록 - 보틀노트 어드민</title>
+    <meta charset="UTF-8">
+    <title>위스키 목록</title>
+    <th:block layout:fragment="css">
+        <style>
+            .whisky-filter {
+                margin-bottom: 1.5rem;
+            }
+
+            .whisky-table img {
+                width: 50px;
+                height: 50px;
+                object-fit: cover;
+                border-radius: 4px;
+            }
+
+            .action-buttons .btn {
+                margin-right: 0.25rem;
+            }
+
+            .action-buttons .btn:last-child {
+                margin-right: 0;
+            }
+        </style>
+    </th:block>
 </head>
 <body>
 <div layout:fragment="content">
-    <div class="content-header">
-        <h1>위스키 목록</h1>
-        <div class="content-actions">
-            <a th:href="@{/whisky/create}" class="btn btn-primary">새 위스키 등록</a>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">위스키 목록</h1>
+        <a th:href="@{/whisky/add}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> 위스키 추가
+        </a>
+    </div>
+    <div class="card mb-4">
+        <div class="card-body">
+            <form class="row g-3 whisky-filter">
+                <div class="col-md-3">
+                    <label for="category" class="form-label">카테고리</label>
+                    <select id="category" class="form-select">
+                        <option value="">전체</option>
+                        <option value="single-malt">싱글 몰트</option>
+                        <option value="blended">블렌디드</option>
+                        <option value="bourbon">버번</option>
+                        <option value="rye">라이</option>
+                        <option value="irish">아이리시</option>
+                        <option value="other">기타</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="sortBy" class="form-label">정렬</label>
+                    <select id="sortBy" class="form-select">
+                        <option value="name">이름순</option>
+                        <option value="date-desc">최신순</option>
+                        <option value="date-asc">오래된순</option>
+                        <option value="reviews-desc">리뷰 많은순</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="search" class="form-label">검색</label>
+                    <input type="text" class="form-control" id="search" placeholder="위스키 이름 검색">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="button" class="btn btn-primary w-100">
+                        <i class="fas fa-search"></i> 검색
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
-    <!-- 검색 필터 -->
-    <div class="filter-section">
-        <form th:action="@{/whisky/list}" method="get" class="search-form">
-            <div class="form-group">
-                <label>
-                    <select name="searchType" class="form-control">
-                        <option value="name" th:selected="${param.searchType == 'name'}">이름</option>
-                        <option value="brand" th:selected="${param.searchType == 'brand'}">브랜드</option>
-                        <option value="country" th:selected="${param.searchType == 'country'}">국가</option>
-                    </select>
-                </label>
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover whisky-table" id="whiskyTable">
+                    <thead>
+                    <tr>
+                        <th style="width: 60px;">이미지</th>
+                        <th>이름</th>
+                        <th>카테고리</th>
+                        <th>도수</th>
+                        <th>등록일</th>
+                        <th>리뷰 수</th>
+                        <th style="width: 150px;">관리</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><img src="https://via.placeholder.com/50" alt="위스키 이미지"></td>
+                        <td>글렌피딕 12년</td>
+                        <td>싱글 몰트</td>
+                        <td>40%</td>
+                        <td>2025-01-15</td>
+                        <td>128</td>
+                        <td class="action-buttons">
+                            <a href="#" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="상세 보기">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a th:href="@{/whisky/edit/1}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="삭제">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><img src="https://via.placeholder.com/50" alt="위스키 이미지"></td>
+                        <td>발베니 12년 더블우드</td>
+                        <td>싱글 몰트</td>
+                        <td>43%</td>
+                        <td>2025-01-20</td>
+                        <td>96</td>
+                        <td class="action-buttons">
+                            <a href="#" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="상세 보기">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a th:href="@{/whisky/edit/2}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="삭제">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><img src="https://via.placeholder.com/50" alt="위스키 이미지"></td>
+                        <td>맥켈란 12년</td>
+                        <td>싱글 몰트</td>
+                        <td>40%</td>
+                        <td>2025-02-05</td>
+                        <td>112</td>
+                        <td class="action-buttons">
+                            <a href="#" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="상세 보기">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a th:href="@{/whisky/edit/3}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="삭제">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><img src="https://via.placeholder.com/50" alt="위스키 이미지"></td>
+                        <td>조니워커 블루라벨</td>
+                        <td>블렌디드</td>
+                        <td>40%</td>
+                        <td>2025-02-10</td>
+                        <td>87</td>
+                        <td class="action-buttons">
+                            <a href="#" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="상세 보기">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a th:href="@{/whisky/edit/4}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="삭제">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><img src="https://via.placeholder.com/50" alt="위스키 이미지"></td>
+                        <td>라프로익 10년</td>
+                        <td>싱글 몰트</td>
+                        <td>43%</td>
+                        <td>2025-02-15</td>
+                        <td>76</td>
+                        <td class="action-buttons">
+                            <a href="#" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="상세 보기">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a th:href="@{/whisky/edit/5}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="삭제">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><img src="https://via.placeholder.com/50" alt="위스키 이미지"></td>
+                        <td>메이커스 마크</td>
+                        <td>버번</td>
+                        <td>45%</td>
+                        <td>2025-02-20</td>
+                        <td>65</td>
+                        <td class="action-buttons">
+                            <a href="#" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="상세 보기">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a th:href="@{/whisky/edit/6}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="삭제">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><img src="https://via.placeholder.com/50" alt="위스키 이미지"></td>
+                        <td>잭 다니엘스</td>
+                        <td>테네시</td>
+                        <td>40%</td>
+                        <td>2025-03-01</td>
+                        <td>92</td>
+                        <td class="action-buttons">
+                            <a href="#" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="상세 보기">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a th:href="@{/whisky/edit/7}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="삭제">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><img src="https://via.placeholder.com/50" alt="위스키 이미지"></td>
+                        <td>제임슨</td>
+                        <td>아이리시</td>
+                        <td>40%</td>
+                        <td>2025-03-05</td>
+                        <td>58</td>
+                        <td class="action-buttons">
+                            <a href="#" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="상세 보기">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a th:href="@{/whisky/edit/8}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="삭제">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><img src="https://via.placeholder.com/50" alt="위스키 이미지"></td>
+                        <td>히비키 하모니</td>
+                        <td>블렌디드</td>
+                        <td>43%</td>
+                        <td>2025-03-10</td>
+                        <td>72</td>
+                        <td class="action-buttons">
+                            <a href="#" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="상세 보기">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a th:href="@{/whisky/edit/9}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="삭제">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><img src="https://via.placeholder.com/50" alt="위스키 이미지"></td>
+                        <td>아벨라워 12년</td>
+                        <td>싱글 몰트</td>
+                        <td>40%</td>
+                        <td>2025-03-15</td>
+                        <td>45</td>
+                        <td class="action-buttons">
+                            <a href="#" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="상세 보기">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a th:href="@{/whisky/edit/10}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="삭제">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
-            <div class="form-group">
-                <label>
-                    <input type="text" name="keyword" class="form-control" placeholder="검색어"
-                           th:value="${param.keyword}">
-                </label>
-            </div>
-            <button type="submit" class="btn btn-search">검색</button>
-        </form>
+        </div>
     </div>
 </div>
+
+<th:block layout:fragment="script">
+    <script>
+        $(document).ready(function () {
+            // 테이블 초기화
+            initDataTable('whiskyTable', {
+                itemsPerPage: 10
+            });
+
+            // 툴팁 초기화
+            var tooltips = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltips.map(function (tooltip) {
+                return new bootstrap.Tooltip(tooltip);
+            });
+
+            // 삭제 버튼 클릭 이벤트
+            $('.btn-danger').on('click', function () {
+                if (confirm('정말로 이 위스키를 삭제하시겠습니까?')) {
+                    showAlert('위스키가 삭제되었습니다.', 'success');
+                }
+            });
+        });
+    </script>
+</th:block>
 </body>
 </html>

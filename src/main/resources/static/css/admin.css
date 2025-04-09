@@ -1,0 +1,208 @@
+/* 전체 레이아웃 스타일 */
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #f8f9fa;
+}
+
+.wrapper {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+}
+
+/* 사이드바 스타일 */
+#sidebar {
+    min-width: 250px;
+    max-width: 250px;
+    background: #343a40;
+    color: #fff;
+    transition: all 0.3s;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+}
+
+#sidebar.active {
+    margin-left: -250px;
+}
+
+#sidebar .sidebar-header {
+    padding: 20px;
+    background: #212529;
+}
+
+#sidebar ul.components {
+    padding: 20px 0;
+    border-bottom: 1px solid #4b545c;
+}
+
+#sidebar ul p {
+    color: #fff;
+    padding: 10px;
+}
+
+#sidebar ul li a {
+    padding: 10px 20px;
+    font-size: 1.1em;
+    display: block;
+    color: #adb5bd;
+    text-decoration: none;
+}
+
+#sidebar ul li a:hover {
+    color: #fff;
+    background: #495057;
+}
+
+#sidebar ul li.active > a, 
+#sidebar a[aria-expanded="true"] {
+    color: #fff;
+    background: #495057;
+}
+
+/* 메인 콘텐츠 스타일 */
+#content {
+    width: 100%;
+    min-height: 100vh;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+}
+
+#content .navbar {
+    padding: 15px 10px;
+    background: #fff;
+    border: none;
+    border-radius: 0;
+    margin-bottom: 20px;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+#sidebarCollapse {
+    background: #3B82F6;
+    border-color: #3B82F6;
+}
+
+/* 카드 스타일 */
+.card {
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    background-color: #fff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    padding: 1rem;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* 통계 카드 스타일 */
+.stat-card {
+    border-left: 4px solid;
+    border-radius: 0.25rem;
+}
+
+.stat-card.primary {
+    border-left-color: #3B82F6;
+}
+
+.stat-card.success {
+    border-left-color: #10B981;
+}
+
+.stat-card.warning {
+    border-left-color: #F59E0B;
+}
+
+.stat-card.danger {
+    border-left-color: #EF4444;
+}
+
+.stat-card .stat-icon {
+    font-size: 2rem;
+    opacity: 0.7;
+}
+
+.stat-card .stat-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.stat-card .stat-title {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+/* 테이블 스타일 */
+.table-container {
+    background: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.table thead th {
+    border-top: none;
+    border-bottom: 2px solid #dee2e6;
+    font-weight: 600;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.075);
+}
+
+/* 폼 스타일 */
+.form-container {
+    background: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    font-weight: 500;
+}
+
+/* 버튼 스타일 */
+.btn-primary {
+    background-color: #3B82F6;
+    border-color: #3B82F6;
+}
+
+.btn-success {
+    background-color: #10B981;
+    border-color: #10B981;
+}
+
+.btn-warning {
+    background-color: #F59E0B;
+    border-color: #F59E0B;
+}
+
+.btn-danger {
+    background-color: #EF4444;
+    border-color: #EF4444;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+    #sidebar {
+        margin-left: -250px;
+    }
+    #sidebar.active {
+        margin-left: 0;
+    }
+    #content {
+        width: 100%;
+    }
+    #sidebarCollapse span {
+        display: none;
+    }
+}

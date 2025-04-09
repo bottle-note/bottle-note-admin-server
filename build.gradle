@@ -13,7 +13,7 @@ compileJava {
 }
 
 configurations {
-    asciidoctorExt
+    devlomentOnly
     compileOnly {
         extendsFrom annotationProcessor
     }
@@ -35,23 +35,21 @@ allprojects {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-
-    //thymeleaf
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation group: 'nz.net.ultraq.thymeleaf', name: 'thymeleaf-layout-dialect', version: '3.0.0'
+    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.webjars:bootstrap:5.2.3'
+    implementation 'org.webjars:font-awesome:6.2.0'
+    implementation 'org.webjars:jquery:3.6.1'
+    implementation 'org.webjars:chartjs:4.1.1'
 
-    // lombok
-    implementation 'org.projectlombok:lombok'
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.projectlombok:lombok'
 
-    //devtools
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
 
-    //database
-    //implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    //runtimeOnly 'com.mysql:mysql-connector-j'
-    //implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'
+tasks.named('test') {
+    useJUnitPlatform()
 }

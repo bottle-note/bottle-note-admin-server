@@ -1,29 +1,20 @@
 spring:
-  # 애플리케이션 이름
   application:
-    name: bottlenote-admin
-
-  # 타임리프 설정
+    name: bottle-note-admin
   thymeleaf:
     cache: false
+    check-template-location: true
     prefix: classpath:/templates/
     suffix: .html
     mode: HTML
     encoding: UTF-8
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: true
 
-  # 정적 리소스 설정
-  web:
-    resources:
-      static-locations: classpath:/static/
-      cache:
-        period: 0
-
-# 서버 설정
 server:
   port: 8080
-
-# 로깅 설정
-logging:
-  level:
-    root: INFO
-    com.bottlenote: DEBUG
+  servlet:
+    context-path: /
