@@ -1,4 +1,4 @@
-package app.admin.model;
+package app.admin.common.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

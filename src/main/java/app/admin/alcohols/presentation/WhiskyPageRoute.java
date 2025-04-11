@@ -1,26 +1,21 @@
-package app.admin.route;
+package app.admin.alcohols.presentation;
 
 import java.util.List;
 import java.util.Optional;
 
-import app.admin.model.Whisky;
-import app.admin.service.WhiskyService;
-import org.springframework.beans.factory.annotation.Autowired;
+import app.admin.alcohols.model.WhiskyItem;
+import app.admin.alcohols.application.WhiskyService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/whisky")
-public class WhiskyController {
-
+public class WhiskyPageRoute {
   private final WhiskyService whiskyService;
-
-  @Autowired
-  public WhiskyController(WhiskyService whiskyService) {
-    this.whiskyService = whiskyService;
-  }
 
   @GetMapping
   public String list(
@@ -28,27 +23,29 @@ public class WhiskyController {
       @RequestParam(required = false) String category,
       @RequestParam(required = false) String search,
       @RequestParam(required = false, defaultValue = "name") String sortBy) {
+
     model.addAttribute("pageTitle", "위스키 관리");
     model.addAttribute("whiskies", whiskyService.getFilteredWhiskies(category, search, sortBy));
+
     return "whisky/list";
   }
 
   @GetMapping("/add")
   public String addForm(Model model) {
     model.addAttribute("pageTitle", "위스키 추가");
-    model.addAttribute("whisky", new Whisky());
+    model.addAttribute("whisky", new WhiskyItem());
     return "whisky/form";
   }
 
   @PostMapping("/add")
-  public String add(@ModelAttribute Whisky whisky) {
-    whiskyService.addWhisky(whisky);
+  public String add(@ModelAttribute WhiskyItem whiskyItem) {
+    whiskyService.addWhisky(whiskyItem);
     return "redirect:/whisky";
   }
 
   @GetMapping("/edit/{id}")
   public String editForm(@PathVariable Long id, Model model) {
-    Optional<Whisky> whisky = whiskyService.getWhiskyById(id);
+    Optional<WhiskyItem> whisky = whiskyService.getWhiskyById(id);
 
     if (whisky.isPresent()) {
       model.addAttribute("pageTitle", "위스키 수정");
@@ -60,8 +57,8 @@ public class WhiskyController {
   }
 
   @PostMapping("/edit/{id}")
-  public String update(@PathVariable Long id, @ModelAttribute Whisky whisky) {
-    whiskyService.updateWhisky(id, whisky);
+  public String update(@PathVariable Long id, @ModelAttribute WhiskyItem whiskyItem) {
+    whiskyService.updateWhisky(id, whiskyItem);
     return "redirect:/whisky";
   }
 
@@ -79,7 +76,7 @@ public class WhiskyController {
 
   @GetMapping("/api/list")
   @ResponseBody
-  public List<Whisky> getWhiskyList(
+  public List<WhiskyItem> getWhiskyList(
       @RequestParam(required = false) String category,
       @RequestParam(required = false) String search,
       @RequestParam(required = false, defaultValue = "name") String sortBy) {
@@ -88,8 +85,8 @@ public class WhiskyController {
 
   @GetMapping("/api/{id}")
   @ResponseBody
-  public ResponseEntity<Whisky> getWhisky(@PathVariable Long id) {
-    Optional<Whisky> whisky = whiskyService.getWhiskyById(id);
+  public ResponseEntity<WhiskyItem> getWhisky(@PathVariable Long id) {
+    Optional<WhiskyItem> whisky = whiskyService.getWhiskyById(id);
 
     return whisky.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
   }

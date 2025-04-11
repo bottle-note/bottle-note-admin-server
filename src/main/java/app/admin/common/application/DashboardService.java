@@ -1,10 +1,10 @@
-package app.admin.service;
+package app.admin.common.application;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.stream.IntStream;
 
-import app.admin.model.DashboardStats;
+import app.admin.common.model.DashboardStats;
 import org.springframework.stereotype.Service;
 
 @Service

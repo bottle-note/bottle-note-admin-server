@@ -6,11 +6,11 @@
     <title>위스키 목록</title>
     <th:block layout:fragment="css">
         <style>
-            .whisky-filter {
+            .whiskyItem-filter {
                 margin-bottom: 1.5rem;
             }
 
-            .whisky-table img {
+            .whiskyItem-table img {
                 width: 50px;
                 height: 50px;
                 object-fit: cover;
@@ -31,13 +31,13 @@
 <div layout:fragment="content">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3">위스키 목록</h1>
-        <a th:href="@{/whisky/add}" class="btn btn-primary">
+        <a th:href="@{/whiskyItem/add}" class="btn btn-primary">
             <i class="fas fa-plus"></i> 위스키 추가
         </a>
     </div>
     <div class="card mb-4">
         <div class="card-body">
-            <form class="row g-3 whisky-filter">
+            <form class="row g-3 whiskyItem-filter">
                 <div class="col-md-3">
                     <label for="category" class="form-label">카테고리</label>
                     <select id="category" class="form-select">
@@ -74,7 +74,7 @@
     <div class="card">
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-hover whisky-table" id="whiskyTable">
+                <table class="table table-hover whiskyItem-table" id="whiskyTable">
                     <thead>
                     <tr>
                         <th style="width: 60px;">이미지</th>
@@ -98,7 +98,7 @@
                             <a href="#" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="상세 보기">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <a th:href="@{/whisky/edit/1}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
+                            <a th:href="@{/whiskyItem/edit/1}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
                                 <i class="fas fa-edit"></i>
                             </a>
                             <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="삭제">
@@ -117,7 +117,7 @@
                             <a href="#" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="상세 보기">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <a th:href="@{/whisky/edit/2}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
+                            <a th:href="@{/whiskyItem/edit/2}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
                                 <i class="fas fa-edit"></i>
                             </a>
                             <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="삭제">
@@ -136,7 +136,7 @@
                             <a href="#" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="상세 보기">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <a th:href="@{/whisky/edit/3}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
+                            <a th:href="@{/whiskyItem/edit/3}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
                                 <i class="fas fa-edit"></i>
                             </a>
                             <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="삭제">
@@ -155,7 +155,7 @@
                             <a href="#" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="상세 보기">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <a th:href="@{/whisky/edit/4}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
+                            <a th:href="@{/whiskyItem/edit/4}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
                                 <i class="fas fa-edit"></i>
                             </a>
                             <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="삭제">
@@ -174,7 +174,7 @@
                             <a href="#" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="상세 보기">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <a th:href="@{/whisky/edit/5}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
+                            <a th:href="@{/whiskyItem/edit/5}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
                                 <i class="fas fa-edit"></i>
                             </a>
                             <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="삭제">
@@ -193,7 +193,7 @@
                             <a href="#" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="상세 보기">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <a th:href="@{/whisky/edit/6}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
+                            <a th:href="@{/whiskyItem/edit/6}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
                                 <i class="fas fa-edit"></i>
                             </a>
                             <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="삭제">
@@ -212,7 +212,7 @@
                             <a href="#" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="상세 보기">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <a th:href="@{/whisky/edit/7}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
+                            <a th:href="@{/whiskyItem/edit/7}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
                                 <i class="fas fa-edit"></i>
                             </a>
                             <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="삭제">
@@ -231,7 +231,7 @@
                             <a href="#" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="상세 보기">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <a th:href="@{/whisky/edit/8}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
+                            <a th:href="@{/whiskyItem/edit/8}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
                                 <i class="fas fa-edit"></i>
                             </a>
                             <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="삭제">
@@ -250,7 +250,7 @@
                             <a href="#" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="상세 보기">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <a th:href="@{/whisky/edit/9}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
+                            <a th:href="@{/whiskyItem/edit/9}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
                                 <i class="fas fa-edit"></i>
                             </a>
                             <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="삭제">
@@ -269,7 +269,7 @@
                             <a href="#" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="상세 보기">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <a th:href="@{/whisky/edit/10}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
+                            <a th:href="@{/whiskyItem/edit/10}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
                                 <i class="fas fa-edit"></i>
                             </a>
                             <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="삭제">

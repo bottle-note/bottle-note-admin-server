@@ -1,4 +1,4 @@
-package app.admin.route;
+package app.admin.common.presentation;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

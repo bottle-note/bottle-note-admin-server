@@ -1,8 +1,8 @@
-package app.admin.route;
+package app.admin.common.presentation;
 
-import app.admin.model.DashboardStats;
-import app.admin.service.DashboardService;
-import org.springframework.beans.factory.annotation.Autowired;
+import app.admin.common.model.DashboardStats;
+import app.admin.common.application.DashboardService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,15 +10,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/dashboard")
-public class DashboardController {
+public class DashboardPageRoute {
 
   private final DashboardService dashboardService;
-
-  @Autowired
-  public DashboardController(DashboardService dashboardService) {
-    this.dashboardService = dashboardService;
-  }
 
   @GetMapping
   public String dashboard(Model model) {
@@ -27,9 +23,4 @@ public class DashboardController {
     return "dashboard/index";
   }
 
-  @GetMapping("/api/stats")
-  @ResponseBody
-  public DashboardStats getDashboardStats() {
-    return dashboardService.getDashboardStats();
-  }
 }
