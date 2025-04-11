@@ -7,10 +7,10 @@ plugins {
 compileTestJava.options.encoding = 'UTF-8'
 compileTestJava.options.compilerArgs += ['-parameters']
 
-compileJava {
-    options.compilerArgs += ['-parameters']
-    options.encoding = 'UTF-8'
-}
+compileJava.options.compilerArgs += ['-parameters']
+compileJava.options.encoding = 'UTF-8'
+bootJar.archiveFileName = 'app.jar'
+jar.enabled = false
 
 configurations {
     devlomentOnly
@@ -49,6 +49,7 @@ dependencies {
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
+
 
 tasks.named('test') {
     useJUnitPlatform()
