@@ -22,5 +22,4 @@ public class DashboardPageRoute {
     model.addAttribute("stats", dashboardService.getDashboardStats());
     return "dashboard/index";
   }
-
 }

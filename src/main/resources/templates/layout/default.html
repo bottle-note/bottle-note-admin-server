@@ -23,8 +23,9 @@
                 </a>
             </li>
 
-            <li th:classappend="${currentUrl.contains('/whiskyItem')} ? 'active' : ''">
-                <a th:href="@{/whiskyItem}">
+            <!--/*@thymesVar id="currentUrl" type="app.admin.global.GlobalControllerAdvice"*/-->
+            <li th:classappend="${currentUrl.contains('/whisky')} ? 'active' : ''">
+                <a th:href="@{/whisky}">
                     <i class="fas fa-glass-whiskey"></i> 위스키 관리
                 </a>
             </li>
@@ -83,7 +84,6 @@
 <script th:src="@{/webjars/bootstrap/5.2.3/js/bootstrap.bundle.min.js}"></script>
 <script th:src="@{/webjars/chartjs/4.1.1/chart.umd.min.js}"></script>
 <script th:src="@{/js/admin.js}"></script>
-
 <th:block layout:fragment="script"></th:block>
 </body>
 </html>

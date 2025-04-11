@@ -24,9 +24,7 @@ public class WhiskyPageRoute {
       @RequestParam(required = false) String search,
       @RequestParam(required = false, defaultValue = "name") String sortBy) {
 
-    model.addAttribute("pageTitle", "위스키 관리");
-    model.addAttribute("whiskies", whiskyService.getFilteredWhiskies(category, search, sortBy));
-
+    model.addAttribute("whiskyItems", whiskyService.getFilteredWhiskies(category, search, sortBy));
     return "whisky/list";
   }
 
