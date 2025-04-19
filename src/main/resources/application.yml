@@ -13,6 +13,21 @@ spring:
       enabled: true
     restart:
       enabled: true
+  jackson:
+    time-zone: Asia/Seoul
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_HOST:localhost:3306}/${DB_NAME:bottle_note}?useSSL=${DB_USE_SSL:false}&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+    username: ${DB_USERNAME:localhost_bottle_note_username}
+    password: ${DB_PASSWORD:localhost_bottle_note_password}
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 10
+      idle-timeout: 300000
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      pool-name: HikariPool-BottleNote
+      leak-detection-threshold: 60000
 
 server:
   port: 8080

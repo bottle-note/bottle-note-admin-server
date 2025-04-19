@@ -3,14 +3,14 @@
       layout:decorate="~{layout/default.html}">
 <head>
     <meta charset="UTF-8">
-    <title>위스키 목록</title>
+    <title>알코올 목록</title>
     <th:block layout:fragment="css">
         <style>
-            .whisky-filter {
+            .alcohol-filter {
                 margin-bottom: 1.5rem;
             }
 
-            .whisky-table img {
+            .alcohol-table img {
                 width: 50px;
                 height: 50px;
                 object-fit: cover;
@@ -36,14 +36,11 @@
 <body>
 <div layout:fragment="content">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3">위스키 목록</h1>
-        <a th:href="@{/whisky/add}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> 위스키 추가
-        </a>
+        <h1 class="h3">알코올 목록</h1>
     </div>
     <div class="card mb-4">
         <div class="card-body">
-            <form class="row g-3 whisky-filter" th:action="@{/whisky}" method="get">
+            <form class="row g-3 alcohol-filter" th:action="@{/alcohols}" method="get">
                 <div class="col-md-3">
                     <label for="type" class="form-label">타입</label>
                     <select id="type" name="type" class="form-select">
@@ -76,7 +73,7 @@
                 </div>
                 <div class="col-md-3">
                     <label for="search" class="form-label">검색</label>
-                    <input type="text" class="form-control" id="search" name="search" th:value="${search}" placeholder="위스키 이름 검색">
+                    <input type="text" class="form-control" id="search" name="search" th:value="${search}" placeholder="알코올 이름 검색">
                 </div>
                 <div class="col-md-12 d-flex justify-content-end">
                     <button type="submit" class="btn btn-primary">
@@ -91,7 +88,7 @@
     <div class="card">
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-hover whisky-table">
+                <table class="table table-hover alcohol-table">
                     <thead>
                     <tr>
                         <th style="width: 60px;">이미지</th>
@@ -105,49 +102,21 @@
                     </thead>
 
                     <tbody>
-                    <tr th:each="whisky : ${whiskies}">
-                        <td><img th:src="${whisky.imageUrl}" alt="위스키 이미지" th:if="${whisky.imageUrl != null}"></td>
-                        <td th:text="${whisky.korName}"></td>
-                        <td th:text="${whisky.engName}"></td>
-                        <td th:text="${whisky.type.name}"></td>
-                        <td th:text="${whisky.korCategory}"></td>
-                        <td th:text="${whisky.abv}"></td>
+                    <tr th:each="alcohol : ${alcohols}">
+                        <td><img th:src="${alcohol.imageUrl}" alt="알코올 이미지" th:if="${alcohol.imageUrl != null}"></td>
+                        <td th:text="${alcohol.korName}"></td>
+                        <td th:text="${alcohol.engName}"></td>
+                        <td th:text="${alcohol.type.name}"></td>
+                        <td th:text="${alcohol.korCategory}"></td>
+                        <td th:text="${alcohol.abv}"></td>
                         <td class="action-buttons">
-                            <a th:href="@{/whisky/{id}(id=${whisky.id})}" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="상세 보기">
+                            <a th:href="@{/alcohols/{id}(id=${alcohol.id})}" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="상세 보기">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <a th:href="@{/whisky/edit/{id}(id=${whisky.id})}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="수정">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" th:data-bs-target="'#deleteModal' + ${whisky.id}" title="삭제">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                            
-                            <!-- 삭제 확인 모달 -->
-                            <div class="modal fade" th:id="'deleteModal' + ${whisky.id}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="deleteModalLabel">위스키 삭제 확인</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <p th:text="'정말 ' + ${whisky.korName} + ' 위스키를 삭제하시겠습니까?'"></p>
-                                            <p class="text-danger">이 작업은 되돌릴 수 없습니다.</p>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                                            <form th:action="@{/whisky/delete/{id}(id=${whisky.id})}" method="post">
-                                                <button type="submit" class="btn btn-danger">삭제</button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </td>
                     </tr>
-                    <tr th:if="${whiskies.isEmpty()}">
-                        <td colspan="7" class="text-center">위스키 데이터가 없습니다.</td>
+                    <tr th:if="${alcohols.isEmpty()}">
+                        <td colspan="7" class="text-center">알코올 데이터가 없습니다.</td>
                     </tr>
                     </tbody>
                 </table>
@@ -158,7 +127,7 @@
                 <ul class="pagination">
                     <!-- 이전 페이지 -->
                     <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                        <a class="page-link" th:href="@{/whisky(page=${currentPage - 1}, size=10, type=${type}, categoryGroup=${categoryGroup}, search=${search}, sortBy=${sortBy})}" aria-label="Previous">
+                        <a class="page-link" th:href="@{/alcohols(page=${currentPage - 1}, size=10, type=${type}, categoryGroup=${categoryGroup}, search=${search}, sortBy=${sortBy})}" aria-label="Previous">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
@@ -166,29 +135,16 @@
                     <!-- 페이지 번호 -->
                     <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" 
                         th:classappend="${currentPage == i} ? 'active'">
-                        <a class="page-link" th:href="@{/whisky(page=${i}, size=10, type=${type}, categoryGroup=${categoryGroup}, search=${search}, sortBy=${sortBy})}" th:text="${i + 1}"></a>
+                        <a class="page-link" th:href="@{/alcohols(page=${i}, size=10, type=${type}, categoryGroup=${categoryGroup}, search=${search}, sortBy=${sortBy})}" th:text="${i + 1}"></a>
                     </li>
                     
                     <!-- 다음 페이지 -->
                     <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                        <a class="page-link" th:href="@{/whisky(page=${currentPage + 1}, size=10, type=${type}, categoryGroup=${categoryGroup}, search=${search}, sortBy=${sortBy})}" aria-label="Next">
+                        <a class="page-link" th:href="@{/alcohols(page=${currentPage + 1}, size=10, type=${type}, categoryGroup=${categoryGroup}, search=${search}, sortBy=${sortBy})}" aria-label="Next">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
                 </ul>
-            </div>
-        </div>
-    </div>
-    
-    <!-- 성공 메시지 토스트 -->
-    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
-        <div id="successToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
-            <div class="toast-header bg-success text-white">
-                <strong class="me-auto">성공</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-            <div class="toast-body" th:text="${successMessage}">
-                작업이 성공적으로 완료되었습니다.
             </div>
         </div>
     </div>
@@ -202,12 +158,6 @@
             tooltips.map(function (tooltip) {
                 return new bootstrap.Tooltip(tooltip);
             });
-            
-            // 성공 메시지가 있으면 토스트 표시
-            if ($('#successToast .toast-body').text().trim() !== '') {
-                var successToast = new bootstrap.Toast(document.getElementById('successToast'));
-                successToast.show();
-            }
         });
     </script>
 </th:block>

@@ -44,35 +44,29 @@
 <body>
 <div layout:fragment="content">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3" th:text="${param.id} ? '위스키 수정' : '위스키 추가'">위스키 추가/수정</h1>
-        <a th:href="@{/whiskyItem}" class="btn btn-secondary">
+        <h1 class="h3" th:text="${whisky != null} ? '위스키 수정' : '위스키 추가'">위스키 추가/수정</h1>
+        <a th:href="@{/whisky}" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> 목록으로 돌아가기
         </a>
     </div>
 
     <div class="card">
         <div class="card-body">
-            <form th:action="${param.id} ? @{/whiskyItem/edit/{id}(id=${param.id})} : @{/whiskyItem/add}" method="post" enctype="multipart/form-data">
+            <form th:action="@{${whisky != null ? '/whisky/edit/' + whisky.id : '/whisky/add'}}" method="post" enctype="multipart/form-data">
                 <div class="row">
                     <!-- 이미지 업로드 영역 -->
                     <div class="col-md-4">
                         <div class="mb-3">
-                            <label for="mainImage" class="form-label required-label">대표 이미지</label>
+                            <label for="imageUrl" class="form-label">대표 이미지 URL</label>
                             <div class="image-preview" id="imagePreview">
-                                <div class="image-preview-placeholder" th:if="${param.id == null}">
+                                <div class="image-preview-placeholder" th:if="${whisky == null || whisky.imageUrl == null}">
                                     <i class="fas fa-image fa-3x mb-2"></i><br>
-                                    이미지를 선택하세요
+                                    이미지 URL을 입력하세요
                                 </div>
-                                <img th:if="${param.id != null}" src="https://via.placeholder.com/300" alt="위스키 이미지">
+                                <img th:if="${whisky != null && whisky.imageUrl != null}" th:src="${whisky.imageUrl}" alt="위스키 이미지">
                             </div>
-                            <input type="file" class="form-control" id="mainImage" name="mainImage" accept="image/*">
-                            <div class="form-text">권장 크기: 500x500 픽셀, 최대 파일 크기: 2MB</div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="additionalImages" class="form-label">추가 이미지</label>
-                            <input type="file" class="form-control" id="additionalImages" name="additionalImages" accept="image/*" multiple>
-                            <div class="form-text">최대 5개까지 업로드 가능, 각 파일 최대 크기: 2MB</div>
+                            <input type="text" class="form-control" id="imageUrl" name="imageUrl" th:value="${whisky != null ? whisky.imageUrl : ''}">
+                            <div class="form-text">이미지 URL을 입력하세요</div>
                         </div>
                     </div>
 
@@ -80,75 +74,70 @@
                     <div class="col-md-8">
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="name" class="form-label required-label">위스키 이름</label>
-                                <input type="text" class="form-control" id="name" name="name" required
-                                       th:value="${param.id != null} ? '글렌피딕 12년' : ''">
+                                <label for="korName" class="form-label required-label">위스키 한글 이름</label>
+                                <input type="text" class="form-control" id="korName" name="korName" required
+                                       th:value="${whisky != null ? whisky.korName : ''}">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="category" class="form-label required-label">카테고리</label>
-                                <select class="form-select" id="category" name="category" required>
-                                    <option value="">카테고리 선택</option>
-                                    <option value="single-malt" th:selected="${param.id != null}">싱글 몰트</option>
-                                    <option value="blended">블렌디드</option>
-                                    <option value="bourbon">버번</option>
-                                    <option value="rye">라이</option>
-                                    <option value="irish">아이리시</option>
-                                    <option value="other">기타</option>
+                                <label for="engName" class="form-label required-label">위스키 영문 이름</label>
+                                <input type="text" class="form-control" id="engName" name="engName" required
+                                       th:value="${whisky != null ? whisky.engName : ''}">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="type" class="form-label required-label">타입</label>
+                                <select class="form-select" id="type" name="type" required>
+                                    <option value="">타입 선택</option>
+                                    <option th:each="alcoholType : ${T(app.admin.alcohols.constant.AlcoholType).values()}"
+                                            th:value="${alcoholType}"
+                                            th:text="${alcoholType.name}"
+                                            th:selected="${whisky != null && whisky.type == alcoholType}">타입</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="categoryGroup" class="form-label required-label">카테고리 그룹</label>
+                                <select class="form-select" id="categoryGroup" name="categoryGroup" required>
+                                    <option value="">카테고리 그룹 선택</option>
+                                    <option th:each="group : ${T(app.admin.alcohols.constant.AlcoholCategoryGroup).values()}"
+                                            th:value="${group}"
+                                            th:text="${group.name}"
+                                            th:selected="${whisky != null && whisky.categoryGroup == group}">카테고리 그룹</option>
                                 </select>
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="alcoholPercentage" class="form-label required-label">알코올 도수 (%)</label>
-                                <input type="number" class="form-control" id="alcoholPercentage" name="alcoholPercentage"
-                                       min="0" max="100" step="0.1" required
-                                       th:value="${param.id != null} ? '40' : ''">
+                                <label for="korCategory" class="form-label required-label">카테고리 한글명</label>
+                                <input type="text" class="form-control" id="korCategory" name="korCategory" required
+                                       th:value="${whisky != null ? whisky.korCategory : ''}">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="volume" class="form-label">용량 (ml)</label>
-                                <input type="number" class="form-control" id="volume" name="volume"
-                                       min="0" step="1"
-                                       th:value="${param.id != null} ? '700' : ''">
+                                <label for="engCategory" class="form-label required-label">카테고리 영문명</label>
+                                <input type="text" class="form-control" id="engCategory" name="engCategory" required
+                                       th:value="${whisky != null ? whisky.engCategory : ''}">
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="origin" class="form-label">원산지</label>
-                                <input type="text" class="form-control" id="origin" name="origin"
-                                       th:value="${param.id != null} ? '스코틀랜드' : ''">
+                                <label for="abv" class="form-label">도수</label>
+                                <input type="text" class="form-control" id="abv" name="abv"
+                                       th:value="${whisky != null ? whisky.abv : ''}">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="manufacturer" class="form-label">제조사</label>
-                                <input type="text" class="form-control" id="manufacturer" name="manufacturer"
-                                       th:value="${param.id != null} ? '글렌피딕 증류소' : ''">
+                                <label for="cask" class="form-label">캐스크 타입</label>
+                                <input type="text" class="form-control" id="cask" name="cask"
+                                       th:value="${whisky != null ? whisky.cask : ''}">
                             </div>
                         </div>
 
+                        <!-- 지역 및 증류소 선택은 실제 구현에서는 드롭다운으로 제공될 수 있습니다 -->
+                        <!-- 여기서는 간단히 처리합니다 -->
                         <div class="mb-3">
-                            <label for="description" class="form-label required-label">설명</label>
-                            <textarea class="form-control" id="description" name="description" rows="5" required>[[${param.id != null} ? '글렌피딕 12년은 스코틀랜드 스페이사이드 지역의 대표적인 싱글 몰트 위스키입니다. 배 향과 사과 향이 특징적이며, 부드러운 맛과 균형 잡힌 피니시가 일품입니다.' : '']]</textarea>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="agingPeriod" class="form-label">숙성 기간 (년)</label>
-                                <input type="number" class="form-control" id="agingPeriod" name="agingPeriod"
-                                       min="0" step="1"
-                                       th:value="${param.id != null} ? '12' : ''">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="caskType" class="form-label">캐스크 타입</label>
-                                <input type="text" class="form-control" id="caskType" name="caskType"
-                                       th:value="${param.id != null} ? '아메리칸 오크, 쉐리 오크' : ''">
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="tasting" class="form-label">테이스팅 노트</label>
-                            <textarea class="form-control" id="tasting" name="tasting"
-                                      rows="3">[[${param.id != null} ? '향: 배, 사과, 꿀\n맛: 과일, 몰트, 오크\n피니시: 부드럽고 균형 잡힌 여운' : '']]</textarea>
+                            <p class="text-muted">지역 및 증류소 정보는 관리자에 의해 별도로 설정됩니다.</p>
                         </div>
                     </div>
                 </div>
@@ -165,37 +154,14 @@
 <th:block layout:fragment="script">
     <script>
         $(document).ready(function () {
-            // 이미지 미리보기 기능
-            $('#mainImage').change(function () {
-                const file = this.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        $('#imagePreview').html('<img src="' + e.target.result + '" alt="위스키 이미지">');
-                    }
-                    reader.readAsDataURL(file);
+            // 이미지 URL 변경 시 미리보기 업데이트
+            $('#imageUrl').on('input', function() {
+                const url = $(this).val();
+                if (url) {
+                    $('#imagePreview').html('<img src="' + url + '" alt="위스키 이미지">');
                 } else {
-                    $('#imagePreview').html('<div class="image-preview-placeholder"><i class="fas fa-image fa-3x mb-2"></i><br>이미지를 선택하세요</div>');
+                    $('#imagePreview').html('<div class="image-preview-placeholder"><i class="fas fa-image fa-3x mb-2"></i><br>이미지 URL을 입력하세요</div>');
                 }
-            });
-
-            // 폼 제출 이벤트
-            $('form').submit(function (e) {
-                e.preventDefault();
-
-                // 실제 구현에서는 AJAX를 사용하여 서버에 데이터 전송
-                // 여기서는 모킹으로 처리
-
-                const isEdit = window.location.href.includes('edit');
-                const message = isEdit ? '위스키 정보가 수정되었습니다.' : '새 위스키가 추가되었습니다.';
-
-                // 알림 표시
-                showAlert(message, 'success');
-
-                // 1초 후 목록 페이지로 이동
-                setTimeout(function () {
-                    window.location.href = '/whiskyItem';
-                }, 1000);
             });
         });
     </script>

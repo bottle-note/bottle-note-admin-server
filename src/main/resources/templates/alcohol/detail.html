@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>알코올 상세 정보</title>
+    <th:block layout:fragment="css">
+        <style>
+            .alcohol-image {
+                max-width: 300px;
+                max-height: 300px;
+                object-fit: contain;
+                margin-bottom: 1.5rem;
+                border-radius: 8px;
+            }
+            
+            .alcohol-info {
+                margin-bottom: 2rem;
+            }
+            
+            .alcohol-info h2 {
+                margin-bottom: 1rem;
+            }
+            
+            .info-label {
+                font-weight: bold;
+                margin-right: 0.5rem;
+            }
+            
+            .info-row {
+                margin-bottom: 0.5rem;
+            }
+            
+            .back-button {
+                margin-top: 1.5rem;
+            }
+        </style>
+    </th:block>
+</head>
+
+<body>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">알코올 상세 정보</h1>
+        <a th:href="@{/alcohols}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> 목록으로 돌아가기
+        </a>
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <!-- 이미지 섹션 -->
+                <div class="col-md-4 text-center">
+                    <img th:if="${alcohol.imageUrl != null}" th:src="${alcohol.imageUrl}" alt="알코올 이미지" class="alcohol-image">
+                    <img th:unless="${alcohol.imageUrl != null}" src="/images/no-image.png" alt="이미지 없음" class="alcohol-image">
+                </div>
+                
+                <!-- 정보 섹션 -->
+                <div class="col-md-8">
+                    <div class="alcohol-info">
+                        <h2 th:text="${alcohol.korName}"></h2>
+                        <p th:text="${alcohol.engName}" class="text-muted"></p>
+                        
+                        <div class="info-row">
+                            <span class="info-label">타입:</span>
+                            <span th:text="${alcohol.type.name}"></span>
+                        </div>
+                        
+                        <div class="info-row">
+                            <span class="info-label">카테고리:</span>
+                            <span th:text="${alcohol.korCategory} + ' (' + ${alcohol.engCategory} + ')'"></span>
+                        </div>
+                        
+                        <div class="info-row">
+                            <span class="info-label">카테고리 그룹:</span>
+                            <span th:text="${alcohol.categoryGroup.name}"></span>
+                        </div>
+                        
+                        <div class="info-row">
+                            <span class="info-label">도수:</span>
+                            <span th:text="${alcohol.abv}"></span>
+                        </div>
+                        
+                        <div class="info-row" th:if="${alcohol.region != null}">
+                            <span class="info-label">국가:</span>
+                            <span th:text="${alcohol.region.name}"></span>
+                        </div>
+                        
+                        <div class="info-row" th:if="${alcohol.distillery != null}">
+                            <span class="info-label">증류소:</span>
+                            <span th:text="${alcohol.distillery.name}"></span>
+                        </div>
+                        
+                        <div class="info-row" th:if="${alcohol.cask != null}">
+                            <span class="info-label">캐스크 타입:</span>
+                            <span th:text="${alcohol.cask}"></span>
+                        </div>
+                    </div>
+                    
+                    <!-- 테이스팅 태그 섹션 -->
+                    <div th:if="${!alcohol.alcoholsTastingTags.isEmpty()}">
+                        <h4>테이스팅 태그</h4>
+                        <div class="d-flex flex-wrap gap-2 mt-2">
+                            <span th:each="tag : ${alcohol.alcoholsTastingTags}" 
+                                  class="badge bg-primary" 
+                                  th:text="${tag.tastingTag.name}"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
