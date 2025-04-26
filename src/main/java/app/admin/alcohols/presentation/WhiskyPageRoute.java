@@ -37,7 +37,7 @@ public class WhiskyPageRoute {
             @RequestParam(defaultValue = "10") int size,
             Model model) {
 
-        Page<Alcohol> whiskies = whiskyService.getFilteredWhiskies(
+        Page<Whisky> whiskies = whiskyService.getFilteredWhiskies(
                 type,
                 categoryGroup,
                 search,
@@ -65,7 +65,7 @@ public class WhiskyPageRoute {
      */
     @GetMapping("/{id}")
     public String getWhiskyDetailPage(@PathVariable Long id, Model model) {
-        Optional<Alcohol> whiskyOpt = whiskyService.getWhiskyById(id);
+        Optional<Whisky> whiskyOpt = whiskyService.getWhiskyById(id);
 
         if (whiskyOpt.isEmpty()) {
             return "redirect:/whisky";
@@ -90,7 +90,7 @@ public class WhiskyPageRoute {
      */
     @GetMapping("/edit/{id}")
     public String getWhiskyEditForm(@PathVariable Long id, Model model) {
-        Optional<Alcohol> whiskyOpt = whiskyService.getWhiskyById(id);
+        Optional<Whisky> whiskyOpt = whiskyService.getWhiskyById(id);
 
         if (whiskyOpt.isEmpty()) {
             return "redirect:/whisky";
@@ -105,7 +105,7 @@ public class WhiskyPageRoute {
      * 새 위스키를 추가합니다.
      */
     @PostMapping("/add")
-    public String addWhisky(@ModelAttribute Alcohol whisky, RedirectAttributes redirectAttributes) {
+    public String addWhisky(@ModelAttribute Whisky whisky, RedirectAttributes redirectAttributes) {
         whiskyService.createWhisky(whisky);
         redirectAttributes.addFlashAttribute("successMessage", "위스키가 성공적으로 추가되었습니다.");
         return "redirect:/whisky";
@@ -115,15 +115,15 @@ public class WhiskyPageRoute {
      * 위스키 정보를 수정합니다.
      */
     @PostMapping("/edit/{id}")
-    public String updateWhisky(@PathVariable Long id, @ModelAttribute Alcohol whiskyData, RedirectAttributes redirectAttributes) {
-        Optional<Alcohol> existingWhiskyOpt = whiskyService.getWhiskyById(id);
+    public String updateWhisky(@PathVariable Long id, @ModelAttribute Whisky whiskyData, RedirectAttributes redirectAttributes) {
+        Optional<Whisky> existingWhiskyOpt = whiskyService.getWhiskyById(id);
 
         if (existingWhiskyOpt.isEmpty()) {
             return "redirect:/whisky";
         }
 
         // 기존 위스키 정보를 가져와서 새 데이터로 업데이트된 위스키 객체 생성
-        Alcohol updatedWhisky = Alcohol.builder()
+        Whisky updatedWhisky = Whisky.builder()
                 .id(id)
                 .korName(whiskyData.getKorName())
                 .engName(whiskyData.getEngName())
