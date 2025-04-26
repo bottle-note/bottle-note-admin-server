@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "tasting_tag")
@@ -31,7 +34,7 @@ public class TastingTag {
     @Column(name = "description")
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "whiskey_id")
-    private Whisky whiskey;
+    @Comment("태그를 가진 위스키들")
+    @OneToMany(mappedBy = "tastingTag")
+    private List<WhiskysTastingTags> whiskysTastingTags = new ArrayList<>();
 }

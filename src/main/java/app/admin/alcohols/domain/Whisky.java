@@ -72,6 +72,6 @@ public class Whisky {
 
     @Builder.Default
     @Comment("해당 위스키의 테이스팅 태그")
-    @OneToMany(mappedBy = "whiskey", fetch = FetchType.LAZY)
-    private Set<TastingTag> alcoholsTastingTags = new HashSet<>();
+    @OneToMany(mappedBy = "whisky", fetch = FetchType.LAZY)
+    private Set<WhiskysTastingTags> alcoholsTastingTags = new HashSet<>();
 }
