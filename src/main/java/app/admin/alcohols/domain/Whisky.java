@@ -11,10 +11,11 @@ import java.util.Set;
 
 @Builder
 @Getter
+@Setter
 @Entity(name = "whisky")
 @Table(name = "alcohol")
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class Whisky {
 
     @Id

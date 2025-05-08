@@ -82,6 +82,8 @@ public class WhiskyPageRoute {
     @GetMapping("/add")
     public String getWhiskyAddForm(Model model) {
         model.addAttribute("pageTitle", "위스키 추가");
+        model.addAttribute("alcoholTypes", AlcoholType.values());
+        model.addAttribute("categoryGroups", AlcoholCategoryGroup.values());
         return "whisky/form";
     }
 
@@ -98,6 +100,8 @@ public class WhiskyPageRoute {
 
         model.addAttribute("whisky", whiskyOpt.get());
         model.addAttribute("pageTitle", "위스키 수정");
+        model.addAttribute("alcoholTypes", AlcoholType.values());
+        model.addAttribute("categoryGroups", AlcoholCategoryGroup.values());
         return "whisky/form";
     }
 
