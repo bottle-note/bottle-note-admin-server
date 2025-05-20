@@ -7,10 +7,7 @@ import app.admin.alcohols.application.WhiskyService;
 import app.admin.alcohols.constant.AlcoholCategoryGroup;
 import app.admin.alcohols.constant.AlcoholType;
 import app.admin.alcohols.constant.SearchSortType;
-import app.admin.alcohols.domain.TastingTagRepository;
-import app.admin.alcohols.domain.Whisky;
-import app.admin.alcohols.domain.WhiskysTastingTags;
-import app.admin.alcohols.domain.WhiskysTastingTagsRepository;
+import app.admin.alcohols.domain.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -79,15 +76,32 @@ public class WhiskyPageRoute {
      * 위스키 상세 페이지를 조회합니다.
      */
     @GetMapping("/{id}")
-    public String getWhiskyDetailPage(@PathVariable Long id, Model model) {
+    public String getWhiskyDetailPage(
+            @PathVariable Long id,
+            Model model
+    ) {
         Optional<Whisky> whiskyOpt = whiskyService.getWhiskyById(id);
-
         if (whiskyOpt.isEmpty()) {
             return "redirect:/whisky";
         }
 
-        model.addAttribute("whisky", whiskyOpt.get());
+        Whisky whisky = whiskyOpt.get();
+        model.addAttribute("whisky", whisky);
         model.addAttribute("pageTitle", "위스키 상세");
+
+        // regionId → korName 조회
+        if (whisky.getRegionId() != null) {
+            Region region = regionService.getRegionById(whisky.getRegionId());
+            model.addAttribute("regionKorName", region.getKorName());
+
+        }
+
+        // distilleryId → korName 조회
+        if (whisky.getDistilleryId() != null) {
+            Distillery distillery = distilleryService.getDistilleryById(whisky.getDistilleryId());
+            model.addAttribute("distilleryKorName", distillery.getKorName());
+        }
+
         return "whisky/detail";
     }
 

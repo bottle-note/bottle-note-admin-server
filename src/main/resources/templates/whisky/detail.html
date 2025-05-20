@@ -13,28 +13,28 @@
                 margin-bottom: 1.5rem;
                 border-radius: 8px;
             }
-            
+
             .whisky-info {
                 margin-bottom: 2rem;
             }
-            
+
             .whisky-info h2 {
                 margin-bottom: 1rem;
             }
-            
+
             .info-label {
                 font-weight: bold;
                 margin-right: 0.5rem;
             }
-            
+
             .info-row {
                 margin-bottom: 0.5rem;
             }
-            
+
             .action-buttons {
                 margin-top: 1.5rem;
             }
-            
+
             .action-buttons .btn {
                 margin-right: 0.5rem;
             }
@@ -50,74 +50,76 @@
             <i class="fas fa-arrow-left"></i> 목록으로 돌아가기
         </a>
     </div>
-    
+
     <div class="card">
         <div class="card-body">
             <div class="row">
                 <!-- 이미지 섹션 -->
                 <div class="col-md-4 text-center">
-                    <img th:if="${whisky.imageUrl != null}" th:src="${whisky.imageUrl}" alt="위스키 이미지" class="whisky-image">
-                    <img th:unless="${whisky.imageUrl != null}" src="/images/no-image.png" alt="이미지 없음" class="whisky-image">
+                    <img th:if="${whisky.imageUrl != null}" th:src="${whisky.imageUrl}" alt="위스키 이미지"
+                         class="whisky-image">
+                    <img th:unless="${whisky.imageUrl != null}" src="/images/no-image.png" alt="이미지 없음"
+                         class="whisky-image">
                 </div>
-                
+
                 <!-- 정보 섹션 -->
                 <div class="col-md-8">
                     <div class="whisky-info">
                         <h2 th:text="${whisky.korName}"></h2>
                         <p th:text="${whisky.engName}" class="text-muted"></p>
-                        
+
                         <div class="info-row">
                             <span class="info-label">타입:</span>
                             <span th:text="${whisky.type.name}"></span>
                         </div>
-                        
+
                         <div class="info-row">
                             <span class="info-label">카테고리:</span>
                             <span th:text="${whisky.korCategory} + ' (' + ${whisky.engCategory} + ')'"></span>
                         </div>
-                        
+
                         <div class="info-row">
                             <span class="info-label">카테고리 그룹:</span>
                             <span th:text="${whisky.categoryGroup.name}"></span>
                         </div>
-                        
+
                         <div class="info-row">
                             <span class="info-label">도수:</span>
                             <span th:text="${whisky.abv}"></span>
                         </div>
                         
-                        <div class="info-row" th:if="${whisky.region != null}">
+                        <div class="info-row" th:if="${regionKorName != null}">
                             <span class="info-label">국가:</span>
-                            <span th:text="${whisky.region.name}"></span>
+                            <span th:text="${regionKorName}"></span>
                         </div>
-                        
-                        <div class="info-row" th:if="${whisky.distillery != null}">
+                        <div class="info-row" th:if="${distilleryKorName != null}">
                             <span class="info-label">증류소:</span>
-                            <span th:text="${whisky.distillery.name}"></span>
+                            <span th:text="${distilleryKorName}"></span>
                         </div>
-                        
+
                         <div class="info-row" th:if="${whisky.cask != null}">
                             <span class="info-label">캐스크 타입:</span>
                             <span th:text="${whisky.cask}"></span>
                         </div>
                     </div>
-                    
+
                     <!-- 테이스팅 태그 섹션 -->
                     <div th:if="${!whisky.alcoholsTastingTags.isEmpty()}">
                         <h4>테이스팅 태그</h4>
                         <div class="d-flex flex-wrap gap-2 mt-2">
-                            <span th:each="tag : ${whisky.alcoholsTastingTags}" 
-                                  class="badge bg-primary" 
-                                  th:text="${tag.tastingTag.name}"></span>
+                            <span th:each="tag : ${whisky.alcoholsTastingTags}"
+                                  class="badge bg-primary"
+                                  th:text="${tag.tastingTag.getKorName()}"></span>
                         </div>
                     </div>
-                    
+
                     <!-- 액션 버튼 섹션 -->
                     <div class="action-buttons">
                         <a th:href="@{/whisky/edit/{id}(id=${whisky.id})}" class="btn btn-warning">
                             <i class="fas fa-edit"></i> 수정
                         </a>
-                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                data-bs-target="#deleteModal">
                             <i class="fas fa-trash"></i> 삭제
                         </button>
                     </div>
@@ -125,7 +127,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- 삭제 확인 모달 -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -147,10 +149,11 @@
             </div>
         </div>
     </div>
-    
+
     <!-- 성공 메시지 토스트 -->
     <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
-        <div id="successToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+        <div id="successToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true"
+             data-bs-delay="3000">
             <div class="toast-header bg-success text-white">
                 <strong class="me-auto">성공</strong>
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
