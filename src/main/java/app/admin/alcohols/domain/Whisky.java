@@ -54,14 +54,10 @@ public class Whisky {
     private AlcoholCategoryGroup categoryGroup;
 
     @Comment("국가")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "region_id")
-    private Region region;
+    private Long regionId;
 
     @Comment("증류소")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "distillery_id")
-    private Distillery distillery;
+    private Long distilleryId;
 
     @Comment("캐스트 타입")
     @Column(name = "cask")
@@ -73,6 +69,30 @@ public class Whisky {
 
     @Builder.Default
     @Comment("해당 위스키의 테이스팅 태그")
-    @OneToMany(mappedBy = "whisky", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "whisky", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<WhiskysTastingTags> alcoholsTastingTags = new HashSet<>();
+
+    /**
+     * 새 테이스팅 태그 연관관계를 추가합니다.
+     */
+    public void addTastingTagRelation(WhiskysTastingTags rel) {
+        alcoholsTastingTags.add(rel);
+        rel.setWhisky(this);
+    }
+
+    /**
+     * 특정 테이스팅 태그 연관관계를 제거합니다.
+     */
+    public void removeTastingTagRelation(WhiskysTastingTags rel) {
+        alcoholsTastingTags.remove(rel);
+        rel.setWhisky(null);
+    }
+
+    /**
+     * 모든 테이스팅 태그 연관관계를 초기화합니다.
+     */
+    public void clearTastingTagRelations() {
+        alcoholsTastingTags.forEach(rel -> rel.setWhisky(null));
+        alcoholsTastingTags.clear();
+    }
 }

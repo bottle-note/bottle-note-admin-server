@@ -52,20 +52,24 @@
 
     <div class="card">
         <div class="card-body">
-            <form th:action="@{${whisky != null ? '/whisky/edit/' + whisky.id : '/whisky/add'}}" method="post">
-                <div class="row">
+            <form th:action="@{${whisky != null && whisky.id != null ? '/whisky/edit/' + whisky.id : '/whisky/add'}}" method="post">
+
+            <div class="row">
                     <!-- 이미지 업로드 영역 -->
                     <div class="col-md-4">
                         <div class="mb-3">
                             <label for="imageUrl" class="form-label">대표 이미지 URL</label>
                             <div class="image-preview" id="imagePreview">
-                                <div class="image-preview-placeholder" th:if="${whisky == null || whisky.imageUrl == null}">
+                                <div class="image-preview-placeholder"
+                                     th:if="${whisky == null || whisky.imageUrl == null}">
                                     <i class="fas fa-image fa-3x mb-2"></i><br>
                                     이미지 URL을 입력하세요
                                 </div>
-                                <img th:if="${whisky != null && whisky.imageUrl != null}" th:src="${whisky.imageUrl}" alt="위스키 이미지">
+                                <img th:if="${whisky != null && whisky.imageUrl != null}" th:src="${whisky.imageUrl}"
+                                     alt="위스키 이미지">
                             </div>
-                            <input type="text" class="form-control" id="imageUrl" name="imageUrl" th:value="${whisky != null ? whisky.imageUrl : ''}">
+                            <input type="text" class="form-control" id="imageUrl" name="imageUrl"
+                                   th:value="${whisky != null ? whisky.imageUrl : ''}">
                             <div class="form-text">이미지 URL을 입력하세요</div>
                         </div>
                     </div>
@@ -93,7 +97,8 @@
                                     <option th:each="alcoholType : ${T(app.admin.alcohols.constant.AlcoholType).values()}"
                                             th:value="${alcoholType.name()}"
                                             th:text="${alcoholType.type}"
-                                            th:selected="${whisky != null && whisky.type == alcoholType}">타입</option>
+                                            th:selected="${whisky != null && whisky.type == alcoholType}">타입
+                                    </option>
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">
@@ -103,7 +108,8 @@
                                     <option th:each="group : ${T(app.admin.alcohols.constant.AlcoholCategoryGroup).values()}"
                                             th:value="${group.name()}"
                                             th:text="${group.description}"
-                                            th:selected="${whisky != null && whisky.categoryGroup == group}">카테고리 그룹</option>
+                                            th:selected="${whisky != null && whisky.categoryGroup == group}">카테고리 그룹
+                                    </option>
                                 </select>
                             </div>
                         </div>
@@ -134,11 +140,114 @@
                             </div>
                         </div>
 
-                        <!-- 지역 및 증류소 선택은 실제 구현에서는 드롭다운으로 제공될 수 있습니다 -->
-                        <!-- 여기서는 간단히 처리합니다 -->
-                        <div class="mb-3">
-                            <p class="text-muted">지역 및 증류소 정보는 관리자에 의해 별도로 설정됩니다.</p>
+                        <!--                        <div class="row">-->
+                        <!--                            <div class="col-md-6 mb-3">-->
+                        <!--                                <label for="region" class="form-label required-label">지역 (Region)</label>-->
+                        <!--                                <select class="form-select" id="region" name="region.id" required>-->
+                        <!--                                    <option value="">지역 선택</option>-->
+                        <!--                                    <option th:each="region : ${regions}"-->
+                        <!--                                            th:value="${region.id}"-->
+                        <!--                                            th:text="${region.korName + ' (' + region.engName + ')'}"-->
+                        <!--                                            th:selected="${whisky != null && whisky.regionId != null && whisky.regionId == region.id}">-->
+                        <!--                                        지역-->
+                        <!--                                    </option>-->
+                        <!--                                </select>-->
+                        <!--                            </div>-->
+                        <!--                            <div class="col-md-6 mb-3">-->
+                        <!--                                <label for="distillery" class="form-label required-label">증류소 (Distillery)</label>-->
+                        <!--                                <select class="form-select" id="distillery" name="distillery.id" required>-->
+                        <!--                                    <option value="">증류소 선택</option>-->
+                        <!--                                    <option th:each="distillery : ${distilleries}"-->
+                        <!--                                            th:value="${distillery.id}"-->
+                        <!--                                            th:text="${distillery.korName + ' (' + distillery.engName + ')'}"-->
+                        <!--                                            th:selected="${whisky != null && whisky.distilleryId != null && whisky.distilleryId == distillery.id}">-->
+                        <!--                                        증류소-->
+                        <!--                                    </option>-->
+                        <!--                                </select>-->
+                        <!--                            </div>-->
+                        <!--                        </div>-->
+
+                        <!--                        <div class="mb-3">-->
+                        <!--                            <label class="form-label">테이스팅 태그 (Tasting Tags)</label>-->
+                        <!--                            <div class="input-group mb-3">-->
+                        <!--                                <select class="form-select" id="tastingTagSelect">-->
+                        <!--                                    <option value="">테이스팅 태그 선택</option>-->
+                        <!--                                    <option th:each="tag : ${tastingTags}"-->
+                        <!--                                            th:value="${tag.id}"-->
+                        <!--                                            th:text="${tag.korName + ' (' + tag.engName + ')'}">-->
+                        <!--                                        태그 이름-->
+                        <!--                                    </option>-->
+                        <!--                                </select>-->
+                        <!--                                <button class="btn btn-outline-secondary" type="button" id="addTastingTagBtn">추가-->
+                        <!--                                </button>-->
+                        <!--                            </div>-->
+
+                        <!--                            &lt;!&ndash; 선택된 태그들이 표시될 영역 &ndash;&gt;-->
+                        <!--                            <div id="selectedTastingTags" class="mb-3">-->
+                        <!--                                &lt;!&ndash; 이미 선택된 태그들 (수정 시) &ndash;&gt;-->
+                        <!--                                <div th:each="tagId : ${selectedTastingTagIds}" th:attr="data-tag-id=${tagId}"-->
+                        <!--                                     class="badge bg-primary me-2 mb-2 p-2 selected-tag">-->
+                        <!--                                    <span th:text="${tagId}">태그 ID</span>-->
+                        <!--                                    <i class="fas fa-times ms-1 remove-tag" style="cursor: pointer;"></i>-->
+                        <!--                                    <input type="hidden" name="tastingTagIds" th:value="${tagId}">-->
+                        <!--                                </div>-->
+                        <!--                            </div>-->
+
+                        <!-- Region / Distillery -->
+                        <!-- Region / Distillery -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="regionId" class="form-label required-label">지역 (Region)</label>
+                                <select id="regionId" name="regionId" class="form-select" required>
+                                    <option value="" disabled>— 지역 선택 —</option>
+                                    <option th:each="r : ${regions}"
+                                            th:value="${r.id}"
+                                            th:text="${r.korName + ' (' + r.engName + ')'}"
+                                            th:selected="${whisky != null && whisky.regionId != null && whisky.regionId == r.id}">
+                                        Region
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="distilleryId" class="form-label required-label">증류소 (Distillery)</label>
+                                <select id="distilleryId" name="distilleryId" class="form-select" required>
+                                    <option value="" disabled>— 증류소 선택 —</option>
+                                    <option th:each="d : ${distilleries}"
+                                            th:value="${d.id}"
+                                            th:text="${d.korName + ' (' + d.engName + ')'}"
+                                            th:selected="${whisky != null && whisky.distilleryId != null && whisky.distilleryId == d.id}">
+                                        Distillery
+                                    </option>
+                                </select>
+                            </div>
                         </div>
+
+                        <!-- Tasting Tags (동적 추가) -->
+                        <div class="mb-3">
+                            <label class="form-label">테이스팅 태그</label>
+                            <div class="input-group mb-2">
+                                <select class="form-select" id="tastingTagSelect">
+                                    <option value="">태그 선택</option>
+                                    <option th:each="tag : ${tastingTags}"
+                                            th:value="${tag.id}"
+                                            th:text="${tag.korName + ' / ' + tag.engName}">Tag
+                                    </option>
+                                </select>
+                                <button type="button" class="btn btn-outline-secondary"
+                                        id="addTastingTagBtn">추가
+                                </button>
+                            </div>
+                            <div id="selectedTastingTags" class="mb-3">
+                                <div th:each="tagId : ${selectedTastingTagIds}"
+                                     th:attr="data-tag-id=${tagId}"
+                                     class="badge bg-primary me-2 mb-2 p-2 selected-tag">
+                                    <span th:text="${tagId}">ID</span>
+                                    <i class="fas fa-times ms-1 remove-tag" style="cursor:pointer;"></i>
+                                    <input type="hidden" name="tastingTagIds" th:value="${tagId}">
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
@@ -146,6 +255,7 @@
                     <button type="button" class="btn btn-secondary me-2" onclick="history.back()">취소</button>
                     <button type="submit" class="btn btn-primary">저장</button>
                 </div>
+
             </form>
         </div>
     </div>
@@ -155,13 +265,43 @@
     <script>
         $(document).ready(function () {
             // 이미지 URL 변경 시 미리보기 업데이트
-            $('#imageUrl').on('input', function() {
+            $('#imageUrl').on('input', function () {
                 const url = $(this).val();
                 if (url) {
                     $('#imagePreview').html('<img src="' + url + '" alt="위스키 이미지">');
                 } else {
                     $('#imagePreview').html('<div class="image-preview-placeholder"><i class="fas fa-image fa-3x mb-2"></i><br>이미지 URL을 입력하세요</div>');
                 }
+            });
+
+            // 테이스팅 태그 추가 버튼 클릭 이벤트
+            $('#addTastingTagBtn').on('click', function () {
+                const select = $('#tastingTagSelect');
+                const tagId = select.val();
+                const tagText = select.find('option:selected').text();
+
+                if (tagId) {
+                    // 이미 선택된 태그인지 확인
+                    if ($('#selectedTastingTags').find('[data-tag-id="' + tagId + '"]').length === 0) {
+                        // 새 태그 추가
+                        const tagHtml = `
+                            <div data-tag-id="${tagId}" class="badge bg-primary me-2 mb-2 p-2 selected-tag">
+                                <span>${tagText}</span>
+                                <i class="fas fa-times ms-1 remove-tag" style="cursor: pointer;"></i>
+                                <input type="hidden" name="tastingTagIds" value="${tagId}">
+                            </div>
+                        `;
+                        $('#selectedTastingTags').append(tagHtml);
+                    }
+
+                    // 선택 초기화
+                    select.val('');
+                }
+            });
+
+            // 태그 삭제 버튼 클릭 이벤트 (동적으로 생성된 요소에 대한 이벤트 처리)
+            $(document).on('click', '.remove-tag', function () {
+                $(this).closest('.selected-tag').remove();
             });
         });
     </script>

@@ -6,10 +6,12 @@ import lombok.*;
 import org.hibernate.annotations.Comment;
 
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 @Comment("알코올과 테이스팅 태그 연관관계 해소 테이블 ")
+@Table(name = "alcohol_tasting_tags")
 @Entity(name = "whisky_tasting_tags")
 public class WhiskysTastingTags {
 
@@ -20,7 +22,7 @@ public class WhiskysTastingTags {
 
     @Comment("알코올 ID")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "whisky_id", nullable = false)
+    @JoinColumn(name = "alcohol_id", nullable = false)
     private Whisky whisky;
 
     @Comment("테이스팅 태그 ID")

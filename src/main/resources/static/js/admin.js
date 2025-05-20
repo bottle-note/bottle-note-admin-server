@@ -1,15 +1,11 @@
-// 사이드바 토글 기능
+// 사이드바 토글 기능 제거됨
 $(document).ready(function () {
-    $('#sidebarCollapse').on('click', function () {
-        $('#sidebar').toggleClass('active');
-    });
-    
     // 드롭다운 메뉴 초기화
     var dropdowns = document.querySelectorAll('.dropdown-toggle');
     dropdowns.forEach(dropdown => {
         new bootstrap.Dropdown(dropdown);
     });
-    
+
     // 툴팁 초기화
     var tooltips = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     tooltips.map(function (tooltip) {
@@ -33,9 +29,9 @@ function formatDate(date) {
         day = '' + d.getDate(),
         year = d.getFullYear();
 
-    if (month.length < 2) 
+    if (month.length < 2)
         month = '0' + month;
-    if (day.length < 2) 
+    if (day.length < 2)
         day = '0' + day;
 
     return [year, month, day].join('-');
@@ -54,17 +50,17 @@ function showAlert(message, type) {
         alertPlaceholder.id = 'alertPlaceholder';
         document.querySelector('.container-fluid').prepend(alertPlaceholder);
     }
-    
+
     var wrapper = document.createElement('div');
-    wrapper.innerHTML = '<div class="alert alert-' + type + ' alert-dismissible fade show" role="alert">' + 
-                         message + 
-                         '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
-                         '</div>';
-    
+    wrapper.innerHTML = '<div class="alert alert-' + type + ' alert-dismissible fade show" role="alert">' +
+        message +
+        '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+        '</div>';
+
     alertPlaceholder.append(wrapper);
-    
+
     // 5초 후 자동으로 알림 닫기
-    setTimeout(function() {
+    setTimeout(function () {
         var alert = new bootstrap.Alert(wrapper.querySelector('.alert'));
         alert.close();
     }, 5000);
@@ -74,20 +70,20 @@ function showAlert(message, type) {
 function initDataTable(tableId, options) {
     var table = document.getElementById(tableId);
     if (!table) return;
-    
+
     // 페이지네이션 생성
     var totalItems = table.querySelectorAll('tbody tr').length;
     var itemsPerPage = options?.itemsPerPage || 10;
     var totalPages = Math.ceil(totalItems / itemsPerPage);
-    
+
     if (totalPages <= 1) return;
-    
+
     var paginationContainer = document.createElement('nav');
     paginationContainer.setAttribute('aria-label', 'Page navigation');
-    
+
     var paginationList = document.createElement('ul');
     paginationList.className = 'pagination justify-content-center';
-    
+
     // 이전 페이지 버튼
     var prevItem = document.createElement('li');
     prevItem.className = 'page-item disabled';
@@ -98,7 +94,7 @@ function initDataTable(tableId, options) {
     prevLink.innerHTML = '<span aria-hidden="true">&laquo;</span>';
     prevItem.appendChild(prevLink);
     paginationList.appendChild(prevItem);
-    
+
     // 페이지 번호 버튼
     for (var i = 1; i <= totalPages; i++) {
         var pageItem = document.createElement('li');
@@ -110,7 +106,7 @@ function initDataTable(tableId, options) {
         pageItem.appendChild(pageLink);
         paginationList.appendChild(pageItem);
     }
-    
+
     // 다음 페이지 버튼
     var nextItem = document.createElement('li');
     nextItem.className = 'page-item';
@@ -121,21 +117,21 @@ function initDataTable(tableId, options) {
     nextLink.innerHTML = '<span aria-hidden="true">&raquo;</span>';
     nextItem.appendChild(nextLink);
     paginationList.appendChild(nextItem);
-    
+
     paginationContainer.appendChild(paginationList);
     table.parentNode.appendChild(paginationContainer);
-    
+
     // 페이지 클릭 이벤트 처리
     var pageLinks = paginationList.querySelectorAll('.page-link');
-    pageLinks.forEach(function(link) {
-        link.addEventListener('click', function(e) {
+    pageLinks.forEach(function (link) {
+        link.addEventListener('click', function (e) {
             e.preventDefault();
-            
+
             var pageItems = paginationList.querySelectorAll('.page-item');
-            pageItems.forEach(function(item) {
+            pageItems.forEach(function (item) {
                 item.classList.remove('active');
             });
-            
+
             if (this.getAttribute('aria-label') === 'Previous') {
                 var activeItem = paginationList.querySelector('.page-item.active');
                 var prevPageItem = activeItem.previousElementSibling;
@@ -154,12 +150,12 @@ function initDataTable(tableId, options) {
                 this.parentNode.classList.add('active');
                 showTablePage(table, parseInt(this.textContent), itemsPerPage);
             }
-            
+
             // 이전/다음 버튼 상태 업데이트
             updatePaginationButtons(paginationList, totalPages);
         });
     });
-    
+
     // 초기 페이지 표시
     showTablePage(table, 1, itemsPerPage);
 }
@@ -169,8 +165,8 @@ function showTablePage(table, pageNum, itemsPerPage) {
     var rows = table.querySelectorAll('tbody tr');
     var startIndex = (pageNum - 1) * itemsPerPage;
     var endIndex = startIndex + itemsPerPage;
-    
-    rows.forEach(function(row, index) {
+
+    rows.forEach(function (row, index) {
         if (index >= startIndex && index < endIndex) {
             row.style.display = '';
         } else {
@@ -183,16 +179,16 @@ function showTablePage(table, pageNum, itemsPerPage) {
 function updatePaginationButtons(paginationList, totalPages) {
     var activeItem = paginationList.querySelector('.page-item.active');
     var currentPage = parseInt(activeItem.textContent);
-    
+
     var prevItem = paginationList.querySelector('.page-item:first-child');
     var nextItem = paginationList.querySelector('.page-item:last-child');
-    
+
     if (currentPage === 1) {
         prevItem.classList.add('disabled');
     } else {
         prevItem.classList.remove('disabled');
     }
-    
+
     if (currentPage === totalPages) {
         nextItem.classList.add('disabled');
     } else {

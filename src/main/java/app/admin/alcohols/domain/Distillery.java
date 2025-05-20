@@ -4,12 +4,11 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.Comment;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Comment("증류소")
 @Entity(name = "distillery")
@@ -31,8 +30,4 @@ public class Distillery {
     @Comment("증류소 로고 이미지 경로")
     @Column(name = "logo_img_url")
     private String logoImgPath;
-
-    @Comment("증류소 설명")
-    @OneToMany(mappedBy = "distillery")
-    private List<Whisky> alcohol = new ArrayList<>();
 }

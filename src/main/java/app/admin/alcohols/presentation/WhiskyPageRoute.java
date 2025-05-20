@@ -1,19 +1,28 @@
 package app.admin.alcohols.presentation;
 
+import app.admin.alcohols.application.DistilleryService;
+import app.admin.alcohols.application.RegionService;
+import app.admin.alcohols.application.TastingTagService;
 import app.admin.alcohols.application.WhiskyService;
 import app.admin.alcohols.constant.AlcoholCategoryGroup;
 import app.admin.alcohols.constant.AlcoholType;
 import app.admin.alcohols.constant.SearchSortType;
+import app.admin.alcohols.domain.TastingTagRepository;
 import app.admin.alcohols.domain.Whisky;
+import app.admin.alcohols.domain.WhiskysTastingTags;
+import app.admin.alcohols.domain.WhiskysTastingTagsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -23,6 +32,12 @@ import java.util.Optional;
 public class WhiskyPageRoute {
 
     private final WhiskyService whiskyService;
+    private final RegionService regionService;
+    private final DistilleryService distilleryService;
+    private final TastingTagService tastingTagService;
+    private final TastingTagRepository tastingTagRepository;
+    private final WhiskysTastingTagsRepository whiskysTastingTagsRepository;
+
 
     /**
      * 위스키 목록 페이지를 조회합니다.
@@ -76,41 +91,57 @@ public class WhiskyPageRoute {
         return "whisky/detail";
     }
 
-    /**
-     * 위스키 추가 폼 페이지를 조회합니다.
-     */
+    //    @GetMapping("/add")
+//    public String showAddForm(Model model) {
+//        model.addAttribute("whisky", new Whisky());
+//        model.addAttribute("regions", regionService.getAllRegions());
+//        model.addAttribute("distilleries", distilleryService.getAllDistilleries());
+//        model.addAttribute("tastingTags", tastingTagRepository.findAll());
+//        model.addAttribute("selectedTastingTagIds", List.of()); // 신규 등록 시 빈 리스트
+//        return "whisky/form";
+//    }
     @GetMapping("/add")
-    public String getWhiskyAddForm(Model model) {
-        model.addAttribute("pageTitle", "위스키 추가");
-        model.addAttribute("alcoholTypes", AlcoholType.values());
-        model.addAttribute("categoryGroups", AlcoholCategoryGroup.values());
+    public String showAddForm(Model model) {
+        model.addAttribute("whisky", new Whisky());
+        model.addAttribute("regions", regionService.getAllRegions());
+        // ← 이 줄이 빠져 있으면 뷰에서 distilleries 변수가 없어서 폼이 렌더되지 않습니다.
+        model.addAttribute("distilleries", distilleryService.getAllDistilleries());
+        model.addAttribute("tastingTags", tastingTagRepository.findAll());
+        model.addAttribute("selectedTastingTagIds", Collections.emptyList());
         return "whisky/form";
     }
 
-    /**
-     * 위스키 수정 폼 페이지를 조회합니다.
-     */
     @GetMapping("/edit/{id}")
-    public String getWhiskyEditForm(@PathVariable Long id, Model model) {
-        Optional<Whisky> whiskyOpt = whiskyService.getWhiskyById(id);
-
-        if (whiskyOpt.isEmpty()) {
-            return "redirect:/whisky";
-        }
-
-        model.addAttribute("whisky", whiskyOpt.get());
-        model.addAttribute("pageTitle", "위스키 수정");
-        model.addAttribute("alcoholTypes", AlcoholType.values());
-        model.addAttribute("categoryGroups", AlcoholCategoryGroup.values());
+    public String showEditForm(@PathVariable Long id, Model model) {
+        //Whisky whisky = whiskyRepository.findById(id).orElseThrow();
+        Whisky whisky = whiskyService.getWhiskyById(id).orElseThrow();
+        model.addAttribute("whisky", whisky);
+        model.addAttribute("regions", regionService.getAllRegions());
+        model.addAttribute("distilleries", distilleryService.getAllDistilleries());
+        model.addAttribute("tastingTags", tastingTagRepository.findAll());
+        model.addAttribute("selectedTastingTagIds",
+                whisky.getAlcoholsTastingTags().stream()
+                        .map(rel -> rel.getTastingTag().getId())
+                        .toList()
+        );
         return "whisky/form";
     }
 
     /**
      * 새 위스키를 추가합니다.
      */
+    @Transactional
     @PostMapping("/add")
-    public String addWhisky(@ModelAttribute Whisky whisky, RedirectAttributes redirectAttributes) {
-        whiskyService.createWhisky(whisky);
+    public String addWhisky(
+            @ModelAttribute Whisky whisky,
+            @RequestParam(value = "tastingTagIds", required = false) List<String> tastingTagIds,
+            RedirectAttributes redirectAttributes) {
+
+        System.out.println("whisky.getDistilleryId() = " + whisky.getDistilleryId());
+        System.out.println("whisky.getRegionId() = " + whisky.getRegionId());
+
+        whiskyService.createWhiskyWithTags(whisky, tastingTagIds);
+
         redirectAttributes.addFlashAttribute("successMessage", "위스키가 성공적으로 추가되었습니다.");
         return "redirect:/whisky";
     }
@@ -118,8 +149,14 @@ public class WhiskyPageRoute {
     /**
      * 위스키 정보를 수정합니다.
      */
+    @Transactional
     @PostMapping("/edit/{id}")
-    public String updateWhisky(@PathVariable Long id, @ModelAttribute Whisky whiskyData, RedirectAttributes redirectAttributes) {
+    public String updateWhisky(
+            @PathVariable Long id,
+            @ModelAttribute Whisky whiskyData,
+            @RequestParam(value = "tastingTagIds", required = false) List<String> tastingTagIds,
+            RedirectAttributes redirectAttributes) {
+
         Optional<Whisky> existingWhiskyOpt = whiskyService.getWhiskyById(id);
 
         if (existingWhiskyOpt.isEmpty()) {
@@ -136,14 +173,40 @@ public class WhiskyPageRoute {
                 .korCategory(whiskyData.getKorCategory())
                 .engCategory(whiskyData.getEngCategory())
                 .categoryGroup(whiskyData.getCategoryGroup())
-                .region(whiskyData.getRegion())
-                .distillery(whiskyData.getDistillery())
+                .regionId(whiskyData.getRegionId())
+                .distilleryId(whiskyData.getDistilleryId())
                 .cask(whiskyData.getCask())
                 .imageUrl(whiskyData.getImageUrl())
-                .alcoholsTastingTags(whiskyData.getAlcoholsTastingTags())
                 .build();
 
-        whiskyService.updateWhisky(updatedWhisky);
+        // 위스키 정보 업데이트
+        Whisky savedWhisky = whiskyService.updateWhisky(updatedWhisky);
+
+        // 기존 테이스팅 태그 연관관계 삭제
+        whiskysTastingTagsRepository.deleteByWhiskyId(id);
+
+        // 새로운 테이스팅 태그 연관관계 생성
+        if (tastingTagIds != null && !tastingTagIds.isEmpty()) {
+            for (String tagIdStr : tastingTagIds) {
+                try {
+                    // 태그 ID가 숫자인 경우 (기존 태그)
+                    if (tagIdStr.matches("\\d+")) {
+                        Long tagId = Long.parseLong(tagIdStr);
+                        tastingTagRepository.findById(tagId).ifPresent(tastingTag -> {
+                            WhiskysTastingTags whiskysTastingTags = WhiskysTastingTags.createWhiskyTastingTag(savedWhisky, tastingTag);
+                            whiskysTastingTagsRepository.save(whiskysTastingTags);
+                        });
+                    } else {
+                        // 태그 ID가 숫자가 아닌 경우 (새로운 태그 텍스트)
+                        // 현재 구현에서는 새 태그를 생성하지 않고 무시합니다.
+                        // 필요하다면 여기에 새 태그 생성 로직을 추가할 수 있습니다.
+                    }
+                } catch (NumberFormatException e) {
+                    // 숫자 변환 실패 시 무시
+                }
+            }
+        }
+
         redirectAttributes.addFlashAttribute("successMessage", "위스키가 성공적으로 수정되었습니다.");
         return "redirect:/whisky/" + id;
     }

@@ -3,8 +3,8 @@ package app.admin.alcohols.application;
 import app.admin.alcohols.constant.AlcoholCategoryGroup;
 import app.admin.alcohols.constant.AlcoholType;
 import app.admin.alcohols.constant.SearchSortType;
-import app.admin.alcohols.domain.Whisky;
-import app.admin.alcohols.domain.WhiskyRepository;
+import app.admin.alcohols.domain.*;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -24,6 +24,56 @@ import java.util.stream.Collectors;
 public class WhiskyService {
 
     private final WhiskyRepository whiskyRepository;
+    private final TastingTagRepository tastingTagRepository;
+    private final WhiskysTastingTagsRepository whiskysTastingTagsRepository;
+
+    /**
+     * 위스키를 저장하고, 전달된 tastingTagIds에 따라
+     * 기존 태그는 조회·연결, (숫자가 아닌 경우) 새 태그 생성 후 연결합니다.
+     */
+    @Transactional
+    public Whisky createWhiskyWithTags(Whisky whisky, List<String> tastingTagIds) {
+        // 1) Region / Distillery 조회·세팅
+        // 2) 기존 태그 관계 초기화
+        whisky.clearTastingTagRelations();
+
+        // 3) 폼에서 넘어온 태그 아이디/텍스트로 관계 재구성
+        if (tastingTagIds != null) {
+            for (String idOrText : tastingTagIds) {
+                if (idOrText.matches("\\d+")) {
+                    // 기존 태그 조회
+                    Long tagId = Long.parseLong(idOrText);
+                    TastingTag tag = tastingTagRepository.findById(tagId)
+                            .orElseThrow(() -> new EntityNotFoundException("Tag not found: " + tagId));
+                    WhiskysTastingTags rel = WhiskysTastingTags.createWhiskyTastingTag(whisky, tag);
+                    whisky.addTastingTagRelation(rel);
+
+                } else {
+                    // TODO: 새 태그 생성 로직 (엔티티에 Builder/Setter 추가 필요)
+                    // TastingTag newTag = new TastingTag(...);
+                    // tastingTagRepository.save(newTag);
+                    // WhiskysTastingTags rel = WhiskysTastingTags.createWhiskyTastingTag(whisky, newTag);
+                    // whisky.addTastingTagRelation(rel);
+                }
+            }
+        }
+        whisky.setDistilleryId(whisky.getDistilleryId());
+        whisky.setRegionId(whisky.getRegionId());
+
+        // 4) Whisky 저장 (cascade 로 자식 관계도 함께 저장됨)
+        return whiskyRepository.save(whisky);
+    }
+
+    /**
+     * WhiskysTastingTags 저장 & 연관관계 세팅
+     **/
+    private void saveRelation(Whisky whisky, TastingTag tag) {
+        WhiskysTastingTags rel = WhiskysTastingTags.createWhiskyTastingTag(whisky, tag);
+        whiskysTastingTagsRepository.save(rel);
+        // 양방향이 필요하면:
+        // whisky.getAlcoholsTastingTags().add(rel);
+        // tag.getWhiskysTastingTags().add(rel);
+    }
 
     /**
      * 모든 위스키 목록을 조회합니다.

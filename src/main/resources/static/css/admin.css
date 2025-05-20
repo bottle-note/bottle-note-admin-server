@@ -23,7 +23,7 @@ body {
 }
 
 #sidebar.active {
-    margin-left: -250px;
+    margin-left: 0; /* 항상 표시되도록 수정 */
 }
 
 #sidebar .sidebar-header {
@@ -191,18 +191,12 @@ body {
     border-color: #EF4444;
 }
 
-/* 반응형 스타일 */
+/* 반응형 스타일 - 사이드바 항상 표시 */
 @media (max-width: 768px) {
     #sidebar {
-        margin-left: -250px;
-    }
-    #sidebar.active {
-        margin-left: 0;
+        margin-left: 0; /* 항상 표시 */
     }
     #content {
         width: 100%;
-    }
-    #sidebarCollapse span {
-        display: none;
     }
 }
