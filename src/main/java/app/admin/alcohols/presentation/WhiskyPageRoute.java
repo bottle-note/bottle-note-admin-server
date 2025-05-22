@@ -1,9 +1,6 @@
 package app.admin.alcohols.presentation;
 
-import app.admin.alcohols.application.DistilleryService;
-import app.admin.alcohols.application.RegionService;
-import app.admin.alcohols.application.TastingTagService;
-import app.admin.alcohols.application.WhiskyService;
+import app.admin.alcohols.application.*;
 import app.admin.alcohols.constant.AlcoholCategoryGroup;
 import app.admin.alcohols.constant.AlcoholType;
 import app.admin.alcohols.constant.SearchSortType;
@@ -16,8 +13,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -28,10 +27,13 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class WhiskyPageRoute {
 
+    private static final String IMAGE_DIR = "alcohols/whisky";
+
     private final WhiskyService whiskyService;
     private final RegionService regionService;
     private final DistilleryService distilleryService;
     private final TastingTagService tastingTagService;
+    private final S3StorageService s3StorageService;
     private final TastingTagRepository tastingTagRepository;
     private final WhiskysTastingTagsRepository whiskysTastingTagsRepository;
 
@@ -105,20 +107,10 @@ public class WhiskyPageRoute {
         return "whisky/detail";
     }
 
-    //    @GetMapping("/add")
-//    public String showAddForm(Model model) {
-//        model.addAttribute("whisky", new Whisky());
-//        model.addAttribute("regions", regionService.getAllRegions());
-//        model.addAttribute("distilleries", distilleryService.getAllDistilleries());
-//        model.addAttribute("tastingTags", tastingTagRepository.findAll());
-//        model.addAttribute("selectedTastingTagIds", List.of()); // 신규 등록 시 빈 리스트
-//        return "whisky/form";
-//    }
     @GetMapping("/add")
     public String showAddForm(Model model) {
         model.addAttribute("whisky", new Whisky());
         model.addAttribute("regions", regionService.getAllRegions());
-        // ← 이 줄이 빠져 있으면 뷰에서 distilleries 변수가 없어서 폼이 렌더되지 않습니다.
         model.addAttribute("distilleries", distilleryService.getAllDistilleries());
         model.addAttribute("tastingTags", tastingTagRepository.findAll());
         model.addAttribute("selectedTastingTagIds", Collections.emptyList());
@@ -127,7 +119,6 @@ public class WhiskyPageRoute {
 
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
-        //Whisky whisky = whiskyRepository.findById(id).orElseThrow();
         Whisky whisky = whiskyService.getWhiskyById(id).orElseThrow();
         model.addAttribute("whisky", whisky);
         model.addAttribute("regions", regionService.getAllRegions());
@@ -149,11 +140,14 @@ public class WhiskyPageRoute {
     public String addWhisky(
             @ModelAttribute Whisky whisky,
             @RequestParam(value = "tastingTagIds", required = false) List<String> tastingTagIds,
-            RedirectAttributes redirectAttributes) {
+            @RequestParam("imageFile") MultipartFile imageFile,
+            RedirectAttributes redirectAttributes) throws IOException {
 
         System.out.println("whisky.getDistilleryId() = " + whisky.getDistilleryId());
         System.out.println("whisky.getRegionId() = " + whisky.getRegionId());
+        String imageUrl = s3StorageService.uploadWhiskyImage(imageFile, IMAGE_DIR);
 
+        whisky.setImageUrl(imageUrl);
         whiskyService.createWhiskyWithTags(whisky, tastingTagIds);
 
         redirectAttributes.addFlashAttribute("successMessage", "위스키가 성공적으로 추가되었습니다.");

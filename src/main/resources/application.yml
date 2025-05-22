@@ -29,6 +29,15 @@ spring:
       pool-name: HikariPool-BottleNote
       leak-detection-threshold: 60000
 
+aws:
+  s3:
+    bucket-name: ${AWS_BUCKET}
+    access-key: ${AWS_ACCESS_KEY}
+    secret-key: ${AWS_SECRET_KEY}
+    region: ${AWS_REGION}
+  cloudfront:
+    domain: ${AWS_CLOUDFRONT_URL}
+
 server:
   port: 8080
   servlet:

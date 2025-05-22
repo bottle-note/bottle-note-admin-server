@@ -13,7 +13,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity(name = "whisky")
-@Table(name = "alcohol")
+@Table(name = "alcohols")
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public class Whisky {

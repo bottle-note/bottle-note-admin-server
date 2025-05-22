@@ -10,7 +10,7 @@ import org.hibernate.annotations.Comment;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity(name = "region")
+@Entity(name = "regions")
 public class Region {
 
     @Id

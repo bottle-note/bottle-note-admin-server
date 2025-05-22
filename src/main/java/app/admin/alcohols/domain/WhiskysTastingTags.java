@@ -11,7 +11,7 @@ import org.hibernate.annotations.Comment;
 @AllArgsConstructor
 @Builder
 @Comment("알코올과 테이스팅 태그 연관관계 해소 테이블 ")
-@Table(name = "alcohol_tasting_tags")
+@Table(name = "alcohols_tasting_tags")
 @Entity(name = "whisky_tasting_tags")
 public class WhiskysTastingTags {
 

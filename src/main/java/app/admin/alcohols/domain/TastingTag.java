@@ -11,7 +11,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity(name = "tasting_tag")
+@Entity(name = "tasting_tags")
 public class TastingTag {
     @Id
     @Comment("태그 ID")

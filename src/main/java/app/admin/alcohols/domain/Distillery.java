@@ -11,7 +11,7 @@ import org.hibernate.annotations.Comment;
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Comment("증류소")
-@Entity(name = "distillery")
+@Entity(name = "distilleries")
 public class Distillery {
 
     @Id
