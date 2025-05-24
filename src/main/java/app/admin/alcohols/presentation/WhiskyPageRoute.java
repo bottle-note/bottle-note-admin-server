@@ -141,11 +141,24 @@ public class WhiskyPageRoute {
             @ModelAttribute Whisky whisky,
             @RequestParam(value = "tastingTagIds", required = false) List<String> tastingTagIds,
             @RequestParam("imageFile") MultipartFile imageFile,
+            @RequestParam(value = "specificCategory", required = false) String specificCategory,
             RedirectAttributes redirectAttributes) throws IOException {
 
         System.out.println("whisky.getDistilleryId() = " + whisky.getDistilleryId());
         System.out.println("whisky.getRegionId() = " + whisky.getRegionId());
         String imageUrl = s3StorageService.uploadWhiskyImage(imageFile, IMAGE_DIR);
+
+        // Set korCategory from AlcoholCategoryGroup's description
+        whisky.setKorCategory(whisky.getCategoryGroup().getDescription());
+
+        // Set engCategory based on category group
+        if (whisky.getCategoryGroup() == AlcoholCategoryGroup.OTHER && specificCategory != null && !specificCategory.isEmpty()) {
+            // For OTHER category group, use the selected specific category
+            whisky.setEngCategory(specificCategory);
+        } else if (!whisky.getCategoryGroup().getCategories().isEmpty()) {
+            // For other category groups, use the first category from the set
+            whisky.setEngCategory(whisky.getCategoryGroup().getCategories().iterator().next());
+        }
 
         whisky.setImageUrl(imageUrl);
         whiskyService.createWhiskyWithTags(whisky, tastingTagIds);
@@ -163,12 +176,34 @@ public class WhiskyPageRoute {
             @PathVariable Long id,
             @ModelAttribute Whisky whiskyData,
             @RequestParam(value = "tastingTagIds", required = false) List<String> tastingTagIds,
-            RedirectAttributes redirectAttributes) {
+            @RequestParam(value = "specificCategory", required = false) String specificCategory,
+            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+            @RequestParam(value = "existingImageUrl", required = false) String existingImageUrl,
+            RedirectAttributes redirectAttributes) throws IOException {
 
         Optional<Whisky> existingWhiskyOpt = whiskyService.getWhiskyById(id);
 
         if (existingWhiskyOpt.isEmpty()) {
             return "redirect:/whisky";
+        }
+
+        // Get category information from AlcoholCategoryGroup
+        String korCategory = whiskyData.getCategoryGroup().getDescription();
+        String engCategory = "";
+
+        // Set engCategory based on category group
+        if (whiskyData.getCategoryGroup() == AlcoholCategoryGroup.OTHER && specificCategory != null && !specificCategory.isEmpty()) {
+            // For OTHER category group, use the selected specific category
+            engCategory = specificCategory;
+        } else if (!whiskyData.getCategoryGroup().getCategories().isEmpty()) {
+            // For other category groups, use the first category from the set
+            engCategory = whiskyData.getCategoryGroup().getCategories().iterator().next();
+        }
+
+        // Handle image upload if a new image is provided
+        String imageUrl = existingImageUrl;
+        if (imageFile != null && !imageFile.isEmpty()) {
+            imageUrl = s3StorageService.uploadWhiskyImage(imageFile, IMAGE_DIR);
         }
 
         // 기존 위스키 정보를 가져와서 새 데이터로 업데이트된 위스키 객체 생성
@@ -178,13 +213,13 @@ public class WhiskyPageRoute {
                 .engName(whiskyData.getEngName())
                 .abv(whiskyData.getAbv())
                 .type(whiskyData.getType())
-                .korCategory(whiskyData.getKorCategory())
-                .engCategory(whiskyData.getEngCategory())
+                .korCategory(korCategory)
+                .engCategory(engCategory)
                 .categoryGroup(whiskyData.getCategoryGroup())
                 .regionId(whiskyData.getRegionId())
                 .distilleryId(whiskyData.getDistilleryId())
                 .cask(whiskyData.getCask())
-                .imageUrl(whiskyData.getImageUrl())
+                .imageUrl(imageUrl)
                 .build();
 
         // 위스키 정보 업데이트

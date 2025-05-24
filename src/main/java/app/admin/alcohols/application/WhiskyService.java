@@ -37,7 +37,10 @@ public class WhiskyService {
         // 2) 기존 태그 관계 초기화
         whisky.clearTastingTagRelations();
 
-        // 3) 폼에서 넘어온 태그 아이디/텍스트로 관계 재구성
+        // 3) 먼저 Whisky 저장
+        Whisky savedWhisky = whiskyRepository.save(whisky);
+
+        // 4) 폼에서 넘어온 태그 아이디/텍스트로 관계 재구성
         if (tastingTagIds != null) {
             for (String idOrText : tastingTagIds) {
                 if (idOrText.matches("\\d+")) {
@@ -45,23 +48,19 @@ public class WhiskyService {
                     Long tagId = Long.parseLong(idOrText);
                     TastingTag tag = tastingTagRepository.findById(tagId)
                             .orElseThrow(() -> new EntityNotFoundException("Tag not found: " + tagId));
-                    WhiskysTastingTags rel = WhiskysTastingTags.createWhiskyTastingTag(whisky, tag);
-                    whisky.addTastingTagRelation(rel);
-
+                    WhiskysTastingTags rel = WhiskysTastingTags.createWhiskyTastingTag(savedWhisky, tag);
+                    whiskysTastingTagsRepository.save(rel);
                 } else {
                     // TODO: 새 태그 생성 로직 (엔티티에 Builder/Setter 추가 필요)
                     // TastingTag newTag = new TastingTag(...);
                     // tastingTagRepository.save(newTag);
-                    // WhiskysTastingTags rel = WhiskysTastingTags.createWhiskyTastingTag(whisky, newTag);
-                    // whisky.addTastingTagRelation(rel);
+                    // WhiskysTastingTags rel = WhiskysTastingTags.createWhiskyTastingTag(savedWhisky, newTag);
+                    // whiskysTastingTagsRepository.save(rel);
                 }
             }
         }
-        whisky.setDistilleryId(whisky.getDistilleryId());
-        whisky.setRegionId(whisky.getRegionId());
 
-        // 4) Whisky 저장 (cascade 로 자식 관계도 함께 저장됨)
-        return whiskyRepository.save(whisky);
+        return savedWhisky;
     }
 
     /**
@@ -141,6 +140,32 @@ public class WhiskyService {
                     break;
                 case REVIEW:
                     // 리뷰순 정렬 로직 (추후 구현)
+                    break;
+                case LAST_CREATED:
+                    // 최신 등록순 정렬 로직
+                    filtered.sort((w1, w2) -> {
+                        if (w1.getCreateAt() == null && w2.getCreateAt() == null) {
+                            return 0;
+                        } else if (w1.getCreateAt() == null) {
+                            return 1;
+                        } else if (w2.getCreateAt() == null) {
+                            return -1;
+                        }
+                        return w2.getCreateAt().compareTo(w1.getCreateAt()); // 내림차순 (최신순)
+                    });
+                    break;
+                case LAST_MODIFIED:
+                    // 최신 수정 순 정렬 로직
+                    filtered.sort((w1, w2) -> {
+                        if (w1.getLastModifyAt() == null && w2.getLastModifyAt() == null) {
+                            return 0;
+                        } else if (w1.getLastModifyAt() == null) {
+                            return 1;
+                        } else if (w2.getLastModifyAt() == null) {
+                            return -1;
+                        }
+                        return w2.getLastModifyAt().compareTo(w1.getLastModifyAt()); // 내림차순 (최신순)
+                    });
                     break;
             }
         }

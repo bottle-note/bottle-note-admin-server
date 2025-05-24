@@ -116,18 +116,22 @@
                             </div>
                         </div>
 
-                        <div class="row">
+                        <!-- 기타 알코올 선택 시 나타나는 카테고리 영문명 선택 드롭다운 -->
+                        <div class="row" id="otherCategoryRow" style="display: none;">
                             <div class="col-md-6 mb-3">
-                                <label for="korCategory" class="form-label required-label">카테고리 한글명</label>
-                                <input type="text" class="form-control" id="korCategory" name="korCategory" required
-                                       th:value="${whisky != null ? whisky.korCategory : ''}">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="engCategory" class="form-label required-label">카테고리 영문명</label>
-                                <input type="text" class="form-control" id="engCategory" name="engCategory" required
-                                       th:value="${whisky != null ? whisky.engCategory : ''}">
+                                <label for="specificCategory" class="form-label required-label">카테고리 영문명</label>
+                                <select class="form-select" id="specificCategory" name="specificCategory">
+                                    <option value="">카테고리 영문명 선택</option>
+                                    <option value="Single Pot Still" th:selected="${whisky != null && whisky.categoryGroup == T(app.admin.alcohols.constant.AlcoholCategoryGroup).OTHER && whisky.engCategory == 'Single Pot Still'}">Single Pot Still</option>
+                                    <option value="Single Grain" th:selected="${whisky != null && whisky.categoryGroup == T(app.admin.alcohols.constant.AlcoholCategoryGroup).OTHER && whisky.engCategory == 'Single Grain'}">Single Grain</option>
+                                    <option value="Spirit" th:selected="${whisky != null && whisky.categoryGroup == T(app.admin.alcohols.constant.AlcoholCategoryGroup).OTHER && whisky.engCategory == 'Spirit'}">Spirit</option>
+                                    <option value="Tennessee" th:selected="${whisky != null && whisky.categoryGroup == T(app.admin.alcohols.constant.AlcoholCategoryGroup).OTHER && whisky.engCategory == 'Tennessee'}">Tennessee</option>
+                                    <option value="Wheat" th:selected="${whisky != null && whisky.categoryGroup == T(app.admin.alcohols.constant.AlcoholCategoryGroup).OTHER && whisky.engCategory == 'Wheat'}">Wheat</option>
+                                    <option value="Corn" th:selected="${whisky != null && whisky.categoryGroup == T(app.admin.alcohols.constant.AlcoholCategoryGroup).OTHER && whisky.engCategory == 'Corn'}">Corn</option>
+                                </select>
                             </div>
                         </div>
+
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -221,6 +225,24 @@
                 }
             });
 
+            // 카테고리 그룹 변경 시 기타 알코올 카테고리 드롭다운 표시/숨김 처리
+            $('#categoryGroup').on('change', function() {
+                const selectedValue = $(this).val();
+                if (selectedValue === 'OTHER') {
+                    $('#otherCategoryRow').show();
+                    $('#specificCategory').prop('required', true);
+                } else {
+                    $('#otherCategoryRow').hide();
+                    $('#specificCategory').prop('required', false);
+                }
+            });
+
+            // 페이지 로드 시 초기 상태 설정
+            if ($('#categoryGroup').val() === 'OTHER') {
+                $('#otherCategoryRow').show();
+                $('#specificCategory').prop('required', true);
+            }
+
             // 테이스팅 태그 추가/삭제 기존 스크립트
             $('#addTastingTagBtn').on('click', function () {
                 const select = $('#tastingTagSelect');
@@ -244,4 +266,3 @@
 </th:block>
 </body>
 </html>
-

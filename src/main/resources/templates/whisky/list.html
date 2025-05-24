@@ -56,7 +56,7 @@
                 <option value="" th:selected="${sortBy == null}">정렬 선택</option>
                 <option th:each="s : ${sortTypes}"
                         th:value="${s.name()}"
-                        th:text="${s.name()}"
+                        th:text="${s.getName()}"
                         th:selected="${sortBy == s}">
                 </option>
             </select>

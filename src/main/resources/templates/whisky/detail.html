@@ -38,6 +38,23 @@
             .action-buttons .btn {
                 margin-right: 0.5rem;
             }
+
+            .admin-info {
+                font-size: 0.85rem;
+                padding: 10px;
+                background-color: #f8f9fa;
+                border-radius: 5px;
+                margin-top: 1rem;
+            }
+
+            .admin-info h6 {
+                font-size: 0.9rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .admin-info .info-row {
+                margin-bottom: 0.25rem;
+            }
         </style>
     </th:block>
 </head>
@@ -64,42 +81,68 @@
 
                 <!-- 정보 섹션 -->
                 <div class="col-md-8">
-                    <div class="whisky-info">
-                        <h2 th:text="${whisky.korName}"></h2>
-                        <p th:text="${whisky.engName}" class="text-muted"></p>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="whisky-info">
+                                <h2 th:text="${whisky.korName}"></h2>
+                                <p th:text="${whisky.engName}" class="text-muted"></p>
 
-                        <div class="info-row">
-                            <span class="info-label">타입:</span>
-                            <span th:text="${whisky.type.name}"></span>
-                        </div>
+                                <div class="info-row">
+                                    <span class="info-label">타입:</span>
+                                    <span th:text="${whisky.type.name}"></span>
+                                </div>
 
-                        <div class="info-row">
-                            <span class="info-label">카테고리:</span>
-                            <span th:text="${whisky.korCategory} + ' (' + ${whisky.engCategory} + ')'"></span>
-                        </div>
+                                <div class="info-row">
+                                    <span class="info-label">카테고리:</span>
+                                    <span th:text="${whisky.korCategory} + ' (' + ${whisky.engCategory} + ')'"></span>
+                                </div>
 
-                        <div class="info-row">
-                            <span class="info-label">카테고리 그룹:</span>
-                            <span th:text="${whisky.categoryGroup.name}"></span>
-                        </div>
+                                <div class="info-row">
+                                    <span class="info-label">카테고리 그룹:</span>
+                                    <span th:text="${whisky.categoryGroup.name}"></span>
+                                </div>
 
-                        <div class="info-row">
-                            <span class="info-label">도수:</span>
-                            <span th:text="${whisky.abv}"></span>
-                        </div>
+                                <div class="info-row">
+                                    <span class="info-label">도수:</span>
+                                    <span th:text="${whisky.abv}"></span>
+                                </div>
 
-                        <div class="info-row" th:if="${regionKorName != null}">
-                            <span class="info-label">국가:</span>
-                            <span th:text="${regionKorName}"></span>
-                        </div>
-                        <div class="info-row" th:if="${distilleryKorName != null}">
-                            <span class="info-label">증류소:</span>
-                            <span th:text="${distilleryKorName}"></span>
-                        </div>
+                                <div class="info-row" th:if="${regionKorName != null}">
+                                    <span class="info-label">국가:</span>
+                                    <span th:text="${regionKorName}"></span>
+                                </div>
+                                <div class="info-row" th:if="${distilleryKorName != null}">
+                                    <span class="info-label">증류소:</span>
+                                    <span th:text="${distilleryKorName}"></span>
+                                </div>
 
-                        <div class="info-row" th:if="${whisky.cask != null}">
-                            <span class="info-label">캐스크 타입:</span>
-                            <span th:text="${whisky.cask}"></span>
+                                <div class="info-row" th:if="${whisky.cask != null}">
+                                    <span class="info-label">캐스크 타입:</span>
+                                    <span th:text="${whisky.cask}"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <!-- 관리 정보 섹션 -->
+                            <div class="admin-info small">
+                                <h6 class="text-muted">관리 정보</h6>
+                                <div class="info-row small">
+                                    <span class="info-label">생성일:</span>
+                                    <span th:text="${#temporals.format(whisky.createAt, 'yyyy-MM-dd HH:mm')}"></span>
+                                </div>
+                                <div class="info-row small">
+                                    <span class="info-label">최종 수정일:</span>
+                                    <span th:text="${#temporals.format(whisky.lastModifyAt, 'yyyy-MM-dd HH:mm')}"></span>
+                                </div>
+                                <div class="info-row small">
+                                    <span class="info-label">생성자:</span>
+                                    <span th:text="${whisky.createBy}"></span>
+                                </div>
+                                <div class="info-row small">
+                                    <span class="info-label">최종 수정자:</span>
+                                    <span th:text="${whisky.lastModifyBy}"></span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -112,6 +155,7 @@
                                   th:text="${tag.tastingTag.getKorName()}"></span>
                         </div>
                     </div>
+
 
                     <!-- 액션 버튼 섹션 -->
                     <div class="action-buttons">
