@@ -2,6 +2,7 @@ package app.admin.alcohols.domain;
 
 import app.admin.alcohols.constant.AlcoholCategoryGroup;
 import app.admin.alcohols.constant.AlcoholType;
+import app.admin.common.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
@@ -16,7 +17,7 @@ import java.util.Set;
 @Table(name = "alcohols")
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
-public class Whisky {
+public class Whisky extends BaseEntity {
 
     @Id
     @Comment("위스키 ID")
