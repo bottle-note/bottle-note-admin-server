@@ -1,0 +1,19 @@
+version: "3.9"
+services:
+  dev-bottle-note-admin:
+    build:
+      context: .
+    container_name: dev-bottle-note-admin
+    ports:
+      - "8081:8081"
+    env_file:
+      - .env
+    environment:
+      - TZ=Asia/Seoul
+      - SPRING_PROFILES_ACTIVE=dev
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
