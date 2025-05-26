@@ -39,7 +39,7 @@ jobs:
         uses: burnett01/rsync-deployments@6.0.0
         with:
           switches: -avzr --delete # rsync 명령어 옵션
-          remote_path: /home/ubuntu/app/bottle-note
+          remote_path: /home/bottlenote/app/bottle-note-admin-server
           remote_host: ${{ secrets.DEV_SERVER_IP }}
           remote_port: ${{ secrets.DEV_SERVER_PORT }}
           remote_user: bottlenote
