@@ -35,7 +35,7 @@ jobs:
           host: ${{ secrets.DEV_SERVER_IP }}
           port: ${{ secrets.DEV_SERVER_PORT }}
           username: ${{ secrets.DEV_SERVER_USER }}
-          #password: ${{ secrets.DEV_SERVER_PASSWORD }}
+          password: ${{ secrets.DEV_SERVER_PASSWORD }}
           key: ${{ secrets.DEV_SERVER_SSH_KEY }}
           script: |
             echo "::group::Deploy Setup and Gradle Build"
