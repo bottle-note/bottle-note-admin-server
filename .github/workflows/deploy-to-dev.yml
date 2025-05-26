@@ -63,7 +63,7 @@ jobs:
             docker stop dev-bottle-note || echo "⚠️ No container to stop"
             docker rm dev-bottle-note || echo "⚠️ No container to remove"
 
-            docker-compose -f docker-compose-dev.yml up -d --no-deps --build dev-bottle-note
+            docker-compose -f docker-compose-dev.yml up -d --no-deps --build dev-bottle-note-admin
             docker ps | grep dev-bottle-note
             echo "::endgroup::"
 
