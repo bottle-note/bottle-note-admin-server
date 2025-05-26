@@ -1,62 +1,45 @@
 name: Dev Deploy Workflow
 
-# 배포 작업 개선으로 인한 기존 워크플로우 비 활성화
 on:
   workflow_dispatch:
 
-# 동시에 여러 워크플로우가 실행되지 않도록 설정
 concurrency:
   group: "dev-deploy"
   cancel-in-progress: false
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-latest  # 워크플로우는 최신 Ubuntu 환경에서 실행됩니다.
+    runs-on: ubuntu-latest
     steps:
-      # 코드 체크아웃
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          submodules: true  # 서브모듈 체크아웃 활성화
-          token: ${{ secrets.GIT_ACCESS_TOKEN }}  # private 저장소 접근을 위한 토큰
+          submodules: true
+          token: ${{ secrets.GIT_ACCESS_TOKEN }}
 
-      # 서브모듈 업데이트 (최신 상태로 동기화)
       - name: Update submodules
         run: |
           echo "🔄 Updating git submodules..."
           git submodule update --init --recursive
           git submodule update --remote
 
-      ## JDK 17 설정
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      ## 원격 환경에 코드 복사
-      - name: 프로젝트 복사
-        uses: burnett01/rsync-deployments@6.0.0
-        with:
-          switches: -avzr --delete # rsync 명령어 옵션
-          remote_path: /home/bottlenote/app/bottle-note-admin-server
-          remote_host: ${{ secrets.DEV_SERVER_IP }}
-          remote_port: ${{ secrets.DEV_SERVER_PORT }}
-          remote_user: bottlenote
-          remote_key: ${{ secrets.DEV_SSH_KEY }}
-
-      ## deploy setup 및 Gradle 빌드
-      - name: 설정 배포 및 Gradle 빌드
+      - name: Remote Gradle Build
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.DEV_SERVER_IP }}
           port: ${{ secrets.DEV_SERVER_PORT }}
-          username: ubuntu
-          key: ${{ secrets.DEV_SSH_KEY }}
+          username: ${{ secrets.DEV_SERVER_USER }}
+          password: ${{ secrets.DEV_SERVER_PASSWORD }}
+          key: ${{ secrets.DEV_SERVER_SSH_KEY }}
           script: |
             echo "::group::Deploy Setup and Gradle Build"
-            echo "📁 Navigating to project directory"
-            cd /home/ubuntu/app/bottle-note
+            cd /home/${{ secrets.DEV_SERVER_USER }}/app/bottle-note-admin-server
 
             echo "📝 Creating application.yml from secret"
             echo "${{ secrets.APPLICATION_DEV }}" | base64 --decode > src/main/resources/application.yml
@@ -70,29 +53,24 @@ jobs:
             echo "✅ Gradle build completed"
             echo "::endgroup::"
 
-      ## 개발 도커 실행
-      - name: 도커 구성
+      - name: Remote Docker Deploy
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.DEV_SERVER_IP }}
           port: ${{ secrets.DEV_SERVER_PORT }}
-          username: ubuntu
+          username: ${{ secrets.DEV_SERVER_USER }}
+          password: ${{ secrets.DEV_SERVER_PASSWORD }}
           key: ${{ secrets.DEV_SSH_KEY }}
           script: |
             echo "::group::Docker Compose Build and Run"
-            echo "📁 Navigating to project directory"
-            cd /home/ubuntu/app/bottle-note
+            cd /home/${{ secrets.DEV_SERVER_USER }}/app/bottle-note-admin-server
 
-            echo "🛑 Stopping existing container if any"
-            docker stop dev-bottle-note || echo "⚠️ No container to stop"
-            docker rm dev-bottle-note || echo "⚠️ No container to remove"
+            docker stop dev-bottle-note-admin || echo "⚠️ No container to stop"
+            docker rm dev-bottle-note-admin || echo "⚠️ No container to remove"
 
-            echo "🚀 Building and starting container"
-            docker-compose -f docker-compose-dev.yml up -d --no-deps --build dev-bottle-note
+            docker-compose -f docker-compose-dev.yml up -d --no-deps --build dev-bottle-note-admin
 
-            echo "📦 Current running containers:"
-            docker ps | grep dev-bottle-note
+            docker ps | grep dev-bottle-note-admin
             echo "::endgroup::"
 
-            echo "🧹 Pruning unused Docker images"
             docker image prune -f
