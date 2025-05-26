@@ -60,7 +60,6 @@ jobs:
           port: ${{ secrets.DEV_SERVER_PORT }}
           username: ${{ secrets.DEV_SERVER_USER }}
           password: ${{ secrets.DEV_SERVER_PASSWORD }}
-          key: ${{ secrets.DEV_SSH_KEY }}
           script: |
             echo "::group::Docker Compose Build and Run"
             cd /home/${{ secrets.DEV_SERVER_USER }}/app/bottle-note-admin-server
