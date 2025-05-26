@@ -53,7 +53,7 @@ jobs:
             echo "⚙️ Starting Gradle build"
             set -x
             chmod +x gradlew
-            ./gradlew clean build -x asciidoctor -x copyRestDocs
+            ./gradlew clean build
             set +x
             echo "✅ Gradle build completed"
             echo "::endgroup::"
