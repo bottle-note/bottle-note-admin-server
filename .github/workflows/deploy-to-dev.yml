@@ -42,6 +42,7 @@ jobs:
           username: ${{ secrets.DEV_SERVER_USER }}
           password: ${{ secrets.DEV_SERVER_PASSWORD }}
           script: |
+            echo "${{ secrets.ADMIN_ENV }}" | base64 --decode > /home/${{ secrets.DEV_SERVER_USER }}/app/bottle-note-admin-server/.env
             echo "::group::Deploy Setup and Gradle Build"
             cd /home/${{ secrets.DEV_SERVER_USER }}/app/bottle-note-admin-server
 
