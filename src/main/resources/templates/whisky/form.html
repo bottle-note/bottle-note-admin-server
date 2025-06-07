@@ -38,6 +38,24 @@
                 content: " *";
                 color: #dc3545;
             }
+
+            /* Select2의 높이를 부트스트랩 인풋과 맞추기 위한 스타일 (선택 사항) */
+            .select2-container--bootstrap-5 .select2-selection {
+                min-height: calc(1.5em + 0.75rem + 2px);
+                padding: 0.375rem 0.75rem;
+                font-size: 1rem;
+                font-weight: 400;
+                line-height: 1.5;
+            }
+
+            .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+                line-height: 1.5;
+            }
+
+            .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
+                height: calc(1.5em + 0.75rem);
+            }
+
         </style>
     </th:block>
 </head>
@@ -56,7 +74,6 @@
                   method="post" enctype="multipart/form-data">
 
                 <div class="row">
-                    <!-- 이미지 업로드 영역 -->
                     <div class="col-md-4">
                         <div class="mb-3">
                             <label for="imageFile" class="form-label">대표 이미지</label>
@@ -76,7 +93,6 @@
                         </div>
                     </div>
 
-                    <!-- 위스키 정보 입력 영역 -->
                     <div class="col-md-8">
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -116,22 +132,38 @@
                             </div>
                         </div>
 
-                        <!-- 기타 알코올 선택 시 나타나는 카테고리 영문명 선택 드롭다운 -->
                         <div class="row" id="otherCategoryRow" style="display: none;">
                             <div class="col-md-6 mb-3">
                                 <label for="specificCategory" class="form-label required-label">카테고리 영문명</label>
                                 <select class="form-select" id="specificCategory" name="specificCategory">
                                     <option value="">카테고리 영문명 선택</option>
-                                    <option value="Single Pot Still" th:selected="${whisky != null && whisky.categoryGroup == T(app.admin.alcohols.constant.AlcoholCategoryGroup).OTHER && whisky.engCategory == 'Single Pot Still'}">Single Pot Still</option>
-                                    <option value="Single Grain" th:selected="${whisky != null && whisky.categoryGroup == T(app.admin.alcohols.constant.AlcoholCategoryGroup).OTHER && whisky.engCategory == 'Single Grain'}">Single Grain</option>
-                                    <option value="Spirit" th:selected="${whisky != null && whisky.categoryGroup == T(app.admin.alcohols.constant.AlcoholCategoryGroup).OTHER && whisky.engCategory == 'Spirit'}">Spirit</option>
-                                    <option value="Tennessee" th:selected="${whisky != null && whisky.categoryGroup == T(app.admin.alcohols.constant.AlcoholCategoryGroup).OTHER && whisky.engCategory == 'Tennessee'}">Tennessee</option>
-                                    <option value="Wheat" th:selected="${whisky != null && whisky.categoryGroup == T(app.admin.alcohols.constant.AlcoholCategoryGroup).OTHER && whisky.engCategory == 'Wheat'}">Wheat</option>
-                                    <option value="Corn" th:selected="${whisky != null && whisky.categoryGroup == T(app.admin.alcohols.constant.AlcoholCategoryGroup).OTHER && whisky.engCategory == 'Corn'}">Corn</option>
+                                    <option value="Single Pot Still"
+                                            th:selected="${whisky != null && whisky.categoryGroup == T(app.admin.alcohols.constant.AlcoholCategoryGroup).OTHER && whisky.engCategory == 'Single Pot Still'}">
+                                        Single Pot Still
+                                    </option>
+                                    <option value="Single Grain"
+                                            th:selected="${whisky != null && whisky.categoryGroup == T(app.admin.alcohols.constant.AlcoholCategoryGroup).OTHER && whisky.engCategory == 'Single Grain'}">
+                                        Single Grain
+                                    </option>
+                                    <option value="Spirit"
+                                            th:selected="${whisky != null && whisky.categoryGroup == T(app.admin.alcohols.constant.AlcoholCategoryGroup).OTHER && whisky.engCategory == 'Spirit'}">
+                                        Spirit
+                                    </option>
+                                    <option value="Tennessee"
+                                            th:selected="${whisky != null && whisky.categoryGroup == T(app.admin.alcohols.constant.AlcoholCategoryGroup).OTHER && whisky.engCategory == 'Tennessee'}">
+                                        Tennessee
+                                    </option>
+                                    <option value="Wheat"
+                                            th:selected="${whisky != null && whisky.categoryGroup == T(app.admin.alcohols.constant.AlcoholCategoryGroup).OTHER && whisky.engCategory == 'Wheat'}">
+                                        Wheat
+                                    </option>
+                                    <option value="Corn"
+                                            th:selected="${whisky != null && whisky.categoryGroup == T(app.admin.alcohols.constant.AlcoholCategoryGroup).OTHER && whisky.engCategory == 'Corn'}">
+                                        Corn
+                                    </option>
                                 </select>
                             </div>
                         </div>
-
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -150,7 +182,7 @@
                             <div class="col-md-6 mb-3">
                                 <label for="regionId" class="form-label required-label">지역 (Region)</label>
                                 <select id="regionId" name="regionId" class="form-select" required>
-                                    <option value="" disabled>— 지역 선택 —</option>
+                                    <option value="" disabled>— 지역 선택 또는 검색 —</option>
                                     <option th:each="r : ${regions}"
                                             th:value="${r.id}"
                                             th:text="${r.korName + ' (' + r.engName + ')'}"
@@ -161,7 +193,7 @@
                             <div class="col-md-6 mb-3">
                                 <label for="distilleryId" class="form-label required-label">증류소 (Distillery)</label>
                                 <select id="distilleryId" name="distilleryId" class="form-select" required>
-                                    <option value="" disabled>— 증류소 선택 —</option>
+                                    <option value="" disabled>— 증류소 선택 또는 검색 —</option>
                                     <option th:each="d : ${distilleries}"
                                             th:value="${d.id}"
                                             th:text="${d.korName + ' (' + d.engName + ')'}"
@@ -175,14 +207,12 @@
                             <label class="form-label">테이스팅 태그</label>
                             <div class="input-group mb-2">
                                 <select class="form-select" id="tastingTagSelect">
-                                    <option value="">태그 선택</option>
+                                    <option value="">태그를 검색하거나 선택하세요</option>
                                     <option th:each="tag : ${tastingTags}"
                                             th:value="${tag.id}"
                                             th:text="${tag.korName + ' / ' + tag.engName}">Tag
                                     </option>
                                 </select>
-                                <button type="button" class="btn btn-outline-secondary" id="addTastingTagBtn">추가
-                                </button>
                             </div>
                             <div id="selectedTastingTags" class="mb-3">
                                 <div th:each="tagId : ${selectedTastingTagIds}"
@@ -193,7 +223,6 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
 
@@ -210,7 +239,12 @@
 <th:block layout:fragment="script">
     <script>
         $(document).ready(function () {
-            // 이미지 URL 텍스트 필드를 제거하고, 파일 선택 이벤트로 미리보기 업데이트
+            // [수정] dropdownParent 옵션을 제거하여 라이브러리 충돌 문제를 해결합니다.
+            $('#regionId, #distilleryId, #tastingTagSelect').select2({
+                theme: "bootstrap-5"
+            });
+
+            // 이미지 미리보기 기능 (기존과 동일)
             $('#imageFile').on('change', function (e) {
                 const file = e.target.files[0];
                 const preview = $('#imagePreview');
@@ -225,8 +259,8 @@
                 }
             });
 
-            // 카테고리 그룹 변경 시 기타 알코올 카테고리 드롭다운 표시/숨김 처리
-            $('#categoryGroup').on('change', function() {
+            // 카테고리 그룹 변경 기능 (기존과 동일)
+            $('#categoryGroup').on('change', function () {
                 const selectedValue = $(this).val();
                 if (selectedValue === 'OTHER') {
                     $('#otherCategoryRow').show();
@@ -237,17 +271,18 @@
                 }
             });
 
-            // 페이지 로드 시 초기 상태 설정
+            // 페이지 로드 시 초기 상태 설정 (기존과 동일)
             if ($('#categoryGroup').val() === 'OTHER') {
                 $('#otherCategoryRow').show();
                 $('#specificCategory').prop('required', true);
             }
 
-            // 테이스팅 태그 추가/삭제 기존 스크립트
-            $('#addTastingTagBtn').on('click', function () {
-                const select = $('#tastingTagSelect');
-                const tagId = select.val();
-                const tagText = select.find('option:selected').text();
+            // 테이스팅 태그 추가 로직 (기존과 동일)
+            $('#tastingTagSelect').on('select2:select', function (e) {
+                const data = e.params.data;
+                const tagId = data.id;
+                const tagText = data.text;
+
                 if (tagId && $('#selectedTastingTags').find('[data-tag-id="' + tagId + '"]').length === 0) {
                     const badge = `<div data-tag-id="${tagId}" class="badge bg-primary me-2 mb-2 p-2 selected-tag">
                                         <span>${tagText}</span>
@@ -256,8 +291,10 @@
                                    </div>`;
                     $('#selectedTastingTags').append(badge);
                 }
-                select.val('');
+                $(this).val(null).trigger('change');
             });
+
+            // 태그 삭제 기능 (기존과 동일)
             $(document).on('click', '.remove-tag', function () {
                 $(this).closest('.selected-tag').remove();
             });
