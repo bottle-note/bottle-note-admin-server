@@ -21,6 +21,11 @@
         </a>
     </div>
 
+    <div th:if="${message}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${message}">성공 메시지</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
     <div class="row">
         <div class="col-md-8">
             <div class="card">
@@ -81,6 +86,31 @@
         </div>
 
         <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">새 태그 추가</h5>
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/whisky/tasting-tag/add}" th:object="${newTag}" method="post">
+                        <div class="mb-3">
+                            <label for="korName" class="form-label">한글 이름</label>
+                            <input type="text" class="form-control" id="korName" th:field="*{korName}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="engName" class="form-label">영문 이름</label>
+                            <input type="text" class="form-control" id="engName" th:field="*{engName}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">설명 (선택)</label>
+                            <textarea class="form-control" id="description" th:field="*{description}"
+                                      rows="3"></textarea>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">새 태그 저장</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>
