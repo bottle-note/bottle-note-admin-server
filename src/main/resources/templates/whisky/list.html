@@ -22,10 +22,12 @@
 <div layout:fragment="content">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3" th:text="${pageTitle}">위스키 목록</h1>
-        <a th:href="@{/whisky/add}" class="btn btn-primary">위스키 추가</a>
+        <div>
+            <a th:href="@{/whisky/tasting-tag/add}" class="btn btn-secondary">테이스팅 태그 </a>
+            <a th:href="@{/whisky/add}" class="btn btn-primary ms-2">위스키 추가</a>
+        </div>
     </div>
 
-    <!-- 검색 및 필터 폼 -->
     <form class="row g-2 mb-4" method="get" th:action="@{/whisky}">
         <div class="col-auto">
             <select name="type" class="form-select">
@@ -66,7 +68,6 @@
         </div>
     </form>
 
-    <!-- 위스키 목록 리스트 -->
     <div class="list-group mb-4">
         <div th:each="w : ${whiskies}" class="list-group-item py-2">
             <div class="d-flex align-items-center">
@@ -87,7 +88,6 @@
         </div>
     </div>
 
-    <!-- 페이지네이션: 1~10,11~20 블록 -->
     <nav class="mt-4">
         <ul class="pagination justify-content-center">
             <li th:classappend="${currentPage < 10} ? 'disabled'" class="page-item">

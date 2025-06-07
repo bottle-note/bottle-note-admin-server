@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default.html}">
+<head>
+    <title>테이스팅 태그 관리</title>
+    <th:block layout:fragment="css">
+        <style>
+            .pagination .disabled .page-link {
+                pointer-events: none;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">테이스팅 태그 관리</h1>
+        <a th:href="@{/whisky}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> 위스키 목록으로
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">태그 목록</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                        <tr>
+                            <th>한글 이름</th>
+                            <th>영문 이름</th>
+                            <th>설명</th>
+                            <th style="width: 15%;">관리</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="tag : ${tags}">
+                            <td th:text="${tag.korName}">과일향</td>
+                            <td th:text="${tag.engName}">Fruity</td>
+                            <td th:text="${tag.description}">달콤한 과일의 풍미</td>
+                            <td>
+                                <a th:href="@{/whisky/tasting-tag/add/edit/{id}(id=${tag.id})}"
+                                   class="btn btn-sm btn-outline-secondary">수정</a>
+                                <form th:action="@{/whisky/tasting-tag/add/delete/{id}(id=${tag.id})}" method="post"
+                                      class="d-inline"
+                                      onsubmit="return confirm('정말로 이 태그를 삭제하시겠습니까?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">삭제</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(tags)}">
+                            <td colspan="4" class="text-center">등록된 태그가 없습니다.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <nav class="mt-4" th:if="${totalPages > 0}">
+                        <ul class="pagination justify-content-center">
+                            <li th:classappend="${currentPage < 10} ? 'disabled'" class="page-item">
+                                <a th:href="@{/whisky/tasting-tag/add(page=${(currentPage/10)*10 - 1}, size=${size})}"
+                                   class="page-link">&lt;&lt;</a>
+                            </li>
+                            <li th:each="i : ${#numbers.sequence((currentPage/10)*10 + 1, T(java.lang.Math).min(totalPages, (currentPage/10)*10 + 10))}"
+                                th:classappend="${(i - 1) == currentPage} ? 'active'" class="page-item">
+                                <a th:href="@{/whisky/tasting-tag/add(page=${i - 1}, size=${size})}"
+                                   class="page-link" th:text="${i}">1</a>
+                            </li>
+                            <li th:classappend="${(currentPage/10 + 1)*10 >= totalPages} ? 'disabled'"
+                                class="page-item">
+                                <a th:href="@{/whisky/tasting-tag/add(page=${(currentPage/10 + 1)*10}, size=${size})}"
+                                   class="page-link">&gt;&gt;</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+        </div>
+    </div>
+</div>
+</body>
+</html>
