@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -51,7 +52,8 @@ public class TastingTagPageController {
     public String addTag(
             @Valid @ModelAttribute("newTag") TastingTagRequestDto newTagDto,
             BindingResult bindingResult,
-            Model model) {
+            Model model,
+            RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
             List<TastingTag> tags = tastingTagService.getAllTastingTags();
@@ -60,6 +62,8 @@ public class TastingTagPageController {
         }
 
         tastingTagService.addTag(newTagDto);
+
+        redirectAttributes.addFlashAttribute("message", "태그가 성공적으로 저장되었습니다.");
 
         return "redirect:/whisky/tasting-tag/add";
     }
