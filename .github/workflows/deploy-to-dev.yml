@@ -3,7 +3,7 @@ name: Dev Deploy Workflow
 on:
   push:
     branches:
-      - 'develop'  # develop 브랜치에 push(merge 포함)될 때 실행
+      - 'main'  # main 브랜치에 push(merge 포함)될 때 실행
   workflow_dispatch: # 필요시 수동 실행도 가능하도록 유지
 
 concurrency:
