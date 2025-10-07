@@ -2,7 +2,7 @@ name: Auto Label Issues with GPT
 
 on:
   issues:
-    types: [opened]
+    types: [opened, edited]
 
 jobs:
   auto-label:
@@ -11,65 +11,64 @@ jobs:
       issues: write
       
     steps:
-    # Step 1: 라벨 목록 가져오기
-    - name: Get Available Labels
-      id: get_labels
+    - name: Auto Label Issue
       uses: actions/github-script@v7
       with:
         script: |
+          // 1. 라벨 가져오기
           const labels = await github.rest.issues.listLabelsForRepo({
             owner: context.repo.owner,
             repo: context.repo.repo
           });
+          const labelList = labels.data.map(l => l.name).join(', ');
           
-          const labelNames = labels.data.map(label => label.name);
-          console.log('Available labels:', labelNames);
-          core.setOutput('labels', labelNames.join(', '));
-          return labelNames;
-    
-    # Step 2: 이슈 정보 가져오기
-    - name: Get Issue Info
-      id: get_issue
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const issue = context.payload.issue;
-          console.log('Issue:', issue.title);
-          // 안전한 문자열 처리
-          const safeTitle = issue.title.replace(/"/g, '\\"').replace(/\n/g, ' ');
-          const safeBody = (issue.body || '').replace(/"/g, '\\"').replace(/\n/g, ' ');
+          // 2. GPT API 호출 (Node.js https 모듈 사용)
+          const https = require('https');
+          const payload = JSON.stringify({
+            model: "gpt-3.5-turbo",
+            messages: [{
+              role: "system",
+              content: "You are a GitHub label selector. Return ONLY a JSON array of label names."
+            }, {
+              role: "user",
+              content: `Available labels: ${labelList}\n\nIssue Title: ${context.payload.issue.title}\n\nIssue Body: ${context.payload.issue.body || ''}\n\nSelect 1-3 appropriate labels. Return JSON array only.`
+            }],
+            temperature: 0.3
+          });
           
-          core.setOutput('title', safeTitle);
-          core.setOutput('body', safeBody);
-          core.setOutput('number', issue.number.toString());
-    
-    # Step 3: OpenAI로 라벨 선택 (JSON을 한 줄로)
-    - name: Call OpenAI
-      id: openai
-      uses: Just-Moh-it/openai@v0.0.1
-      with:
-        openai-api-key: ${{ secrets.OPENAI_API_KEY }}
-        openai-mode: "chat"
-        openai-params: '{"model":"gpt-3.5-turbo","messages":[{"role":"system","content":"You select GitHub issue labels. Return ONLY a JSON array of label names."},{"role":"user","content":"Labels: ${{ steps.get_labels.outputs.labels }}\n\nTitle: ${{ steps.get_issue.outputs.title }}\n\nBody: ${{ steps.get_issue.outputs.body }}\n\nReturn JSON array only."}]}'
-    
-    # Step 4: 라벨 적용
-    - name: Apply Labels
-      uses: actions/github-script@v7
-      with:
-        script: |
+          const response = await new Promise((resolve, reject) => {
+            const req = https.request({
+              hostname: 'api.openai.com',
+              path: '/v1/chat/completions',
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ${{ secrets.OPENAI_API_KEY }}'
+              }
+            }, (res) => {
+              let data = '';
+              res.on('data', chunk => data += chunk);
+              res.on('end', () => resolve(JSON.parse(data)));
+            });
+            req.on('error', reject);
+            req.write(payload);
+            req.end();
+          });
+          
+          // 3. 라벨 적용
           try {
-            const response = '${{ steps.openai.outputs.completion }}';
-            const labels = JSON.parse(response);
+            const selectedLabels = JSON.parse(response.choices[0].message.content);
+            console.log('Selected labels:', selectedLabels);
             
-            if (labels && labels.length > 0) {
+            if (selectedLabels.length > 0) {
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: ${{ steps.get_issue.outputs.number }},
-                labels: labels
+                repo: context.repo.repo,  
+                issue_number: context.payload.issue.number,
+                labels: selectedLabels
               });
-              console.log('Applied:', labels);
+              console.log('✅ Labels applied successfully');
             }
           } catch (e) {
-            console.error('Failed:', e);
+            console.error('Failed to apply labels:', e);
           }
