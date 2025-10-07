@@ -2,7 +2,7 @@ name: Auto Label Issues with GPT
 
 on:
   issues:
-    types: [opened, edited]
+    types: [opened]
 
 jobs:
   auto-label:
@@ -11,6 +11,7 @@ jobs:
       issues: write
       
     steps:
+    # Step 1: 라벨 목록 가져오기
     - name: Get Available Labels
       id: get_labels
       uses: actions/github-script@v7
@@ -23,61 +24,61 @@ jobs:
           
           const labelNames = labels.data.map(label => label.name);
           console.log('Available labels:', labelNames);
-          
-          // 출력 설정
           core.setOutput('labels', labelNames.join(', '));
           return labelNames;
     
-    - name: Get Issue Content
+    # Step 2: 이슈 정보 가져오기
+    - name: Get Issue Info
       id: get_issue
       uses: actions/github-script@v7
       with:
         script: |
           const issue = context.payload.issue;
-          const content = `Title: ${issue.title}\nBody: ${issue.body || ''}`;
-          
-          core.setOutput('content', content);
-          core.setOutput('issue_number', issue.number.toString());
-          return content;
+          console.log('Issue:', issue.title);
+          core.setOutput('title', issue.title);
+          core.setOutput('body', issue.body || '');
+          core.setOutput('number', issue.number.toString());
     
-    - name: Select Labels with GPT
-      id: gpt_labels
-      uses: cahaseler/openai-chatgpt-action@v1
+    # Step 3: OpenAI로 라벨 선택
+    - name: Call OpenAI
+      id: openai
+      uses: Just-Moh-it/openai@v0.0.1
       with:
-        apiKey: ${{ secrets.OPENAI_API_KEY }}
-        model: 'gpt-3.5-turbo'
-        temperature: 0.3
-        max_tokens: 200
-        prompt: 'You are a GitHub issue label selector. Return ONLY a JSON array of label names, no other text.'
-        input: |
-          Available labels: ${{ steps.get_labels.outputs.labels }}
-          
-          Issue content: ${{ steps.get_issue.outputs.content }}
-          
-          Select appropriate labels from the available list. Return as JSON array like ["bug", "enhancement"].
+        openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+        openai-mode: "chat"
+        openai-params: |
+          {
+            "model": "gpt-3.5-turbo",
+            "messages": [
+              {
+                "role": "system",
+                "content": "You select GitHub issue labels. Return ONLY a JSON array of label names."
+              },
+              {
+                "role": "user",
+                "content": "Labels: ${{ steps.get_labels.outputs.labels }}\n\nTitle: ${{ steps.get_issue.outputs.title }}\n\nBody: ${{ steps.get_issue.outputs.body }}\n\nReturn JSON array only."
+              }
+            ]
+          }
     
+    # Step 4: 라벨 적용
     - name: Apply Labels
       uses: actions/github-script@v7
       with:
         script: |
           try {
-            // GPT 응답에서 JSON 추출
-            const response = '${{ steps.gpt_labels.outputs.completion }}';
-            const cleanResponse = response.replace(/```json\n?|```\n?/g, '').trim();
-            const selectedLabels = JSON.parse(cleanResponse);
+            const response = '${{ steps.openai.outputs.completion }}';
+            const labels = JSON.parse(response);
             
-            if (selectedLabels && selectedLabels.length > 0) {
-              console.log('Applying labels:', selectedLabels);
-              
+            if (labels && labels.length > 0) {
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: context.payload.issue.number,
-                labels: selectedLabels
+                issue_number: ${{ steps.get_issue.outputs.number }},
+                labels: labels
               });
-              
-              console.log('✅ Labels applied successfully!');
+              console.log('Applied:', labels);
             }
-          } catch (error) {
-            console.error('❌ Error:', error.message);
+          } catch (e) {
+            console.error('Failed:', e);
           }
