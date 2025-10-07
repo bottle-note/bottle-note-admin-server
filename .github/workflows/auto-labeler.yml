@@ -3,8 +3,6 @@ name: Auto Label Issues with GPT
 on:
   issues:
     types: [opened]
-  issue_comment:
-    types: [created]
 
 jobs:
   auto-label:
