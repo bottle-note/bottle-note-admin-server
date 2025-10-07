@@ -1,4 +1,4 @@
-name: Auto Label Issues
+name: Auto Label Issues with GPT
 
 on:
   issues:
@@ -11,34 +11,73 @@ jobs:
       issues: write
       
     steps:
-    - name: Get Labels and Issue Info
+    - name: Get Available Labels
+      id: get_labels
       uses: actions/github-script@v7
       with:
         script: |
-          // 1. 레포지토리의 모든 라벨 가져오기
           const labels = await github.rest.issues.listLabelsForRepo({
             owner: context.repo.owner,
             repo: context.repo.repo
           });
           
-          console.log('=== Repository Labels ===');
-          console.log(`Total labels: ${labels.data.length}`);
-          console.log('------------------------');
-          labels.data.forEach(label => {
-            console.log(`📌 ${label.name}`);
-            console.log(`   Color: #${label.color}`);
-            console.log(`   Description: ${label.description || 'No description'}`);
-            console.log('');
-          });
-          
-          // 2. 현재 이슈 정보 출력
-          console.log('=== Current Issue Info ===');
-          console.log(`Issue #${context.payload.issue.number}`);
-          console.log(`Title: ${context.payload.issue.title}`);
-          console.log(`Body: ${context.payload.issue.body || 'No body'}`);
-          console.log(`Current Labels: ${context.payload.issue.labels.map(l => l.name).join(', ') || 'None'}`);
-          
-          // 3. 라벨 이름만 배열로
           const labelNames = labels.data.map(label => label.name);
-          console.log('\n=== Label Names Array ===');
-          console.log(JSON.stringify(labelNames, null, 2));
+          console.log('Available labels:', labelNames);
+          
+          // 출력 설정
+          core.setOutput('labels', labelNames.join(', '));
+          return labelNames;
+    
+    - name: Get Issue Content
+      id: get_issue
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const issue = context.payload.issue;
+          const content = `Title: ${issue.title}\nBody: ${issue.body || ''}`;
+          
+          core.setOutput('content', content);
+          core.setOutput('issue_number', issue.number.toString());
+          return content;
+    
+    - name: Select Labels with GPT
+      id: gpt_labels
+      uses: cahaseler/openai-chatgpt-action@v1
+      with:
+        apiKey: ${{ secrets.OPENAI_API_KEY }}
+        model: 'gpt-3.5-turbo'
+        temperature: 0.3
+        max_tokens: 200
+        prompt: 'You are a GitHub issue label selector. Return ONLY a JSON array of label names, no other text.'
+        input: |
+          Available labels: ${{ steps.get_labels.outputs.labels }}
+          
+          Issue content: ${{ steps.get_issue.outputs.content }}
+          
+          Select appropriate labels from the available list. Return as JSON array like ["bug", "enhancement"].
+    
+    - name: Apply Labels
+      uses: actions/github-script@v7
+      with:
+        script: |
+          try {
+            // GPT 응답에서 JSON 추출
+            const response = '${{ steps.gpt_labels.outputs.completion }}';
+            const cleanResponse = response.replace(/```json\n?|```\n?/g, '').trim();
+            const selectedLabels = JSON.parse(cleanResponse);
+            
+            if (selectedLabels && selectedLabels.length > 0) {
+              console.log('Applying labels:', selectedLabels);
+              
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.issue.number,
+                labels: selectedLabels
+              });
+              
+              console.log('✅ Labels applied successfully!');
+            }
+          } catch (error) {
+            console.error('❌ Error:', error.message);
+          }
