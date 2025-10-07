@@ -2,7 +2,7 @@ name: Auto Label Issues with GPT
 
 on:
   issues:
-    types: [opened]
+    types: [opened,edited]
 
 jobs:
   auto-label:
