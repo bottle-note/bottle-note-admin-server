@@ -1,0 +1,116 @@
+name: Reset and Create Labels
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: '기존 라벨 모두 삭제하고 새로 생성 (yes 입력)'
+        required: true
+        default: 'no'
+
+jobs:
+  reset-labels:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      
+    steps:
+    - name: Reset and Create Labels
+      if: github.event.inputs.confirm == 'yes'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          // 1. 기존 라벨 모두 삭제
+          console.log('🗑️ 기존 라벨 삭제 중...');
+          const existing = await github.rest.issues.listLabelsForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo
+          });
+          
+          for (const label of existing.data) {
+            try {
+              await github.rest.issues.deleteLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: label.name
+              });
+              console.log(`  ❌ Deleted: ${label.name}`);
+            } catch (e) {
+              console.log(`  ⚠️ Failed to delete: ${label.name}`);
+            }
+          }
+          
+          console.log('\n✨ 새 라벨 생성 중...\n');
+          
+          // 2. 새 라벨 세트 정의
+          const labels = [
+            // 🔴 타입 그룹
+            {"name": "🔴 버그", "color": "d73a4a", "description": "예상과 다르게 동작하는 문제"},
+            {"name": "🔴 새기능", "color": "ff6b6b", "description": "새로운 기능 개발 요청"},
+            {"name": "🔴 리팩토링", "color": "ff8787", "description": "코드 구조 개선 및 최적화 작업"},
+            {"name": "🔴 핫픽스", "color": "b60205", "description": "운영중 발생한 긴급 수정 사항"},
+            
+            // 🔷 영역 그룹
+            {"name": "🔷 백엔드", "color": "1d76db", "description": "서버, API, 비즈니스 로직 관련"},
+            {"name": "🔷 프론트엔드", "color": "4dabf7", "description": "UI, UX, 클라이언트 화면 관련"},
+            {"name": "🔷 인프라", "color": "0c8599", "description": "서버, 배포, CI/CD, 클라우드 관련"},
+            {"name": "🔷 기획", "color": "6c5ce7", "description": "기능 명세, 요구사항 정의 관련"},
+            {"name": "🔷 디자인", "color": "a29bfe", "description": "UI 디자인, 레이아웃, 스타일 관련"},
+            {"name": "🔷 DB", "color": "2e86de", "description": "데이터베이스 스키마, 쿼리, 마이그레이션 관련"},
+            
+            // 🟢 진행 상태 그룹
+            {"name": "🟢 진행중", "color": "fbca04", "description": "현재 작업이 진행되고 있음"},
+            {"name": "🟢 리뷰대기", "color": "ffd43b", "description": "코드 리뷰 또는 검토가 필요함"},
+            {"name": "🟢 완료", "color": "0e8a16", "description": "작업이 완료되어 종료됨"},
+            {"name": "🟢 보류", "color": "e4e669", "description": "일시적으로 작업이 중단됨"},
+            {"name": "🟢 중단", "color": "cccccc", "description": "작업이 취소되거나 폐기됨"},
+            
+            // ⚡ 우선순위 그룹
+            {"name": "⚡ 긴급", "color": "7950f2", "description": "즉시 처리가 필요한 최우선 작업"},
+            {"name": "⚡ 높음", "color": "9775fa", "description": "빠른 시일 내 처리가 필요한 작업"},
+            {"name": "⚡ 보통", "color": "b197fc", "description": "일반적인 우선순위의 작업"},
+            
+            // 💬 기타 그룹
+            {"name": "💬 논의필요", "color": "d4c5f9", "description": "팀원들과 협의가 필요한 사항"},
+            {"name": "💬 문서", "color": "c5def5", "description": "문서화, README, 주석 작업"},
+            {"name": "💬 테스트", "color": "bfd4f2", "description": "테스트 코드 작성 및 QA 관련"}
+          ];
+          
+          // 3. 라벨 생성
+          let created = 0;
+          let failed = 0;
+          
+          for (const label of labels) {
+            try {
+              await github.rest.issues.createLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: label.name,
+                color: label.color,
+                description: label.description
+              });
+              console.log(`  ✅ Created: ${label.name} - "${label.description}"`);
+              created++;
+            } catch (e) {
+              console.log(`  ❌ Failed: ${label.name} - ${e.message}`);
+              failed++;
+            }
+          }
+          
+          console.log('\n' + '='.repeat(50));
+          console.log(`📊 결과: ${created}개 생성 성공, ${failed}개 실패`);
+          console.log('='.repeat(50));
+          
+          // 4. 최종 라벨 목록 출력
+          console.log('\n📋 최종 라벨 구성:');
+          console.log('  🔴 타입: 버그, 새기능, 리팩토링, 핫픽스');
+          console.log('  🔷 영역: 백엔드, 프론트엔드, 인프라, 기획, 디자인, DB');
+          console.log('  🟢 상태: 진행중, 리뷰대기, 완료, 보류, 중단');
+          console.log('  ⚡ 우선순위: 긴급, 높음, 보통');
+          console.log('  💬 기타: 논의필요, 문서, 테스트');
+    
+    - name: Cancelled
+      if: github.event.inputs.confirm != 'yes'
+      run: |
+        echo "❌ 작업 취소됨 - 실행하려면 'yes'를 입력하세요"
+        exit 1
