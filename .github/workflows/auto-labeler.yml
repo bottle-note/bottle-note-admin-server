@@ -2,7 +2,7 @@ name: Auto Label Issues with GPT
 
 on:
   issues:
-    types: [opened,edited]
+    types: [opened]
 
 jobs:
   auto-label:
@@ -35,31 +35,22 @@ jobs:
         script: |
           const issue = context.payload.issue;
           console.log('Issue:', issue.title);
-          core.setOutput('title', issue.title);
-          core.setOutput('body', issue.body || '');
+          // 안전한 문자열 처리
+          const safeTitle = issue.title.replace(/"/g, '\\"').replace(/\n/g, ' ');
+          const safeBody = (issue.body || '').replace(/"/g, '\\"').replace(/\n/g, ' ');
+          
+          core.setOutput('title', safeTitle);
+          core.setOutput('body', safeBody);
           core.setOutput('number', issue.number.toString());
     
-    # Step 3: OpenAI로 라벨 선택
+    # Step 3: OpenAI로 라벨 선택 (JSON을 한 줄로)
     - name: Call OpenAI
       id: openai
       uses: Just-Moh-it/openai@v0.0.1
       with:
         openai-api-key: ${{ secrets.OPENAI_API_KEY }}
         openai-mode: "chat"
-        openai-params: |
-          {
-            "model": "gpt-3.5-turbo",
-            "messages": [
-              {
-                "role": "system",
-                "content": "You select GitHub issue labels. Return ONLY a JSON array of label names."
-              },
-              {
-                "role": "user",
-                "content": "Labels: ${{ steps.get_labels.outputs.labels }}\n\nTitle: ${{ steps.get_issue.outputs.title }}\n\nBody: ${{ steps.get_issue.outputs.body }}\n\nReturn JSON array only."
-              }
-            ]
-          }
+        openai-params: '{"model":"gpt-3.5-turbo","messages":[{"role":"system","content":"You select GitHub issue labels. Return ONLY a JSON array of label names."},{"role":"user","content":"Labels: ${{ steps.get_labels.outputs.labels }}\n\nTitle: ${{ steps.get_issue.outputs.title }}\n\nBody: ${{ steps.get_issue.outputs.body }}\n\nReturn JSON array only."}]}'
     
     # Step 4: 라벨 적용
     - name: Apply Labels
