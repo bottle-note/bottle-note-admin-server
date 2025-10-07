@@ -1,0 +1,137 @@
+name: Update Status Label by Comment
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  update-status:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    
+    steps:
+    - name: Check and Update Status
+      uses: actions/github-script@v7
+      with:
+        script: |
+          // 1. 전체 라벨 목록 가져오기
+          const allLabels = await github.rest.issues.listLabelsForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo
+          });
+          const availableLabels = allLabels.data.map(l => l.name);
+          
+          // 2. 현재 이슈의 라벨
+          const currentLabels = context.payload.issue.labels.map(l => l.name);
+          
+          // 3. 모든 코멘트 가져오기
+          const comments = await github.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.payload.issue.number
+          });
+          
+          const allComments = comments.data.map(c => `[${c.user.login}]: ${c.body}`).join('\n---\n');
+          
+          // 4. GPT로 상태 판단
+          const https = require('https');
+          const payload = JSON.stringify({
+            model: "gpt-3.5-turbo",
+            messages: [{
+              role: "system",
+              content: `You are analyzing GitHub issue conversation to detect status changes.
+              
+              Your task:
+              1. Identify which labels represent STATUS/PROGRESS (usually contains: 진행, 완료, 보류, progress, done, pending, review, etc.)
+              2. Determine if the conversation indicates a status change
+              3. If yes, return the new status label to add
+              4. If the current status seems final (completed/cancelled/closed), return empty array
+              
+              Rules:
+              - Return ONLY labels that exist in available labels
+              - Return maximum 1 status label
+              - Return empty array [] if no clear status change
+              - Remove old status labels by returning them in "remove" field
+              
+              Response format: {"add": ["label"], "remove": ["old_status_label"]}`
+            }, {
+              role: "user",
+              content: `Available Labels: ${availableLabels.join(', ')}
+              Current Labels: ${currentLabels.join(', ')}
+              
+              Issue Title: ${context.payload.issue.title}
+              Issue Body: ${context.payload.issue.body || 'No body'}
+              
+              Latest Comment by @${context.payload.comment.user.login}:
+              "${context.payload.comment.body}"
+              
+              Previous Comments:
+              ${allComments}
+              
+              Analyze if status should be updated based on the conversation.`
+            }],
+            temperature: 0.2
+          });
+          
+          const response = await new Promise((resolve, reject) => {
+            const req = https.request({
+              hostname: 'api.openai.com',
+              path: '/v1/chat/completions',
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ${{ secrets.OPENAI_API_KEY }}'
+              }
+            }, (res) => {
+              let data = '';
+              res.on('data', chunk => data += chunk);
+              res.on('end', () => resolve(JSON.parse(data)));
+            });
+            req.on('error', reject);
+            req.write(payload);
+            req.end();
+          });
+          
+          // 5. 라벨 업데이트
+          try {
+            const result = JSON.parse(response.choices[0].message.content);
+            console.log('GPT Decision:', result);
+            
+            // 제거할 라벨
+            if (result.remove && result.remove.length > 0) {
+              for (const label of result.remove) {
+                if (currentLabels.includes(label)) {
+                  try {
+                    await github.rest.issues.removeLabel({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: context.payload.issue.number,
+                      name: label
+                    });
+                    console.log(`  ❌ Removed: ${label}`);
+                  } catch (e) {
+                    console.log(`  ⚠️ Could not remove: ${label}`);
+                  }
+                }
+              }
+            }
+            
+            // 추가할 라벨
+            if (result.add && result.add.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.issue.number,
+                labels: result.add
+              });
+              
+              console.log(`✅ Added: ${result.add.join(', ')}`);
+              console.log(`   Triggered by: @${context.payload.comment.user.login}`);
+            } else {
+              console.log('ℹ️ No status change detected');
+            }
+            
+          } catch (e) {
+            console.error('Failed to update labels:', e);
+          }
